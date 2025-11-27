@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
-    <!-- Scripts (Defer for better performance) -->
+    <!-- Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -22,7 +22,7 @@
             font-family: 'Nunito', 'Sarabun', sans-serif;
             background-color: #0f172a;
             color: #e2e8f0;
-            overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-x: hidden;
         }
         h1, h2, h3, .brand-font {
             font-family: 'Fredoka', 'Sarabun', sans-serif;
@@ -31,11 +31,11 @@
         /* Optimized Blobs */
         .blob {
             position: absolute;
-            filter: blur(60px); /* Reduced blur for performance */
+            filter: blur(60px);
             z-index: -1;
             opacity: 0.5;
             animation: float 10s infinite ease-in-out;
-            will-change: transform; /* Hint to browser for optimization */
+            will-change: transform;
         }
         
         /* Loading Screen */
@@ -439,8 +439,8 @@
 
         <!-- VIEW: CHAT INTERFACE -->
         <div id="view-chat" class="view-section flex-col items-center">
-            <!-- Responsive Height: 80vh on mobile, 750px on desktop -->
-            <section class="w-full max-w-4xl bg-slate-900/80 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[80vh] md:h-[750px]">
+            <!-- Responsive Height: 80dvh for mobile browsers -->
+            <section class="w-full max-w-4xl bg-slate-900/80 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[80dvh] md:h-[750px]">
                 <!-- Chat Header -->
                 <div class="bg-slate-800 p-4 flex items-center gap-4 border-b border-slate-700">
                     <button onclick="navigateTo('home')" class="md:hidden text-slate-400 hover:text-white mr-2">
@@ -472,13 +472,6 @@
 
                 <!-- Messages Area -->
                 <div id="messages" class="flex-1 p-4 md:p-6 overflow-y-auto chat-container space-y-4 bg-slate-900/50">
-                    <!-- Suggestion Chips (Updated for Portfolio & Search context) -->
-                    <div id="suggestion-chips" class="flex flex-wrap gap-2 justify-center py-4 px-2 mb-2">
-                        <button onclick="fillPrompt('ช่วยค้นหาเทรนด์การออกแบบเว็บปี 2024-2025 ให้หน่อย')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-pink-600 hover:text-white hover:border-pink-500 transition shadow-sm">🔍 เทรนด์เว็บ 2024</button>
-                        <button onclick="fillPrompt('ช่วยหาตัวอย่างพอร์ตโฟลิโอสาย Web Developer เจ๋งๆ จากอินเทอร์เน็ต')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-violet-600 hover:text-white hover:border-violet-500 transition shadow-sm">🌐 ตัวอย่างพอร์ต Dev</button>
-                        <button onclick="fillPrompt('ช่วยร่างโครงสร้างเนื้อหาสำหรับหน้า Portfolio ของฉัน')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 transition shadow-sm">📝 ร่างเนื้อหาพอร์ต</button>
-                        <button onclick="fillPrompt('เขียนโค้ด HTML/Tailwind สำหรับส่วน Hero Section เท่ๆ')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-emerald-600 hover:text-white hover:border-emerald-500 transition shadow-sm">💻 ขอโค้ด Hero Section</button>
-                    </div>
                     
                     <!-- Welcome Message -->
                     <div class="flex gap-3">
@@ -487,6 +480,23 @@
                             <p data-i18n="welcome_msg">Hello! I'm ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้. 👋</p>
                             <p class="mt-2 text-slate-300 text-sm" data-i18n="welcome_sub">You can send me text messages or upload images for me to analyze. How can I help you today?</p>
                         </div>
+                    </div>
+
+                    <!-- Suggestion Chips (Moved Below Welcome Message) -->
+                    <!-- UPDATED: Added responsive centering and margin control for mobile -->
+                    <div id="suggestion-chips" class="flex flex-wrap gap-2 py-2 px-2 justify-center md:justify-start ml-0 md:ml-11">
+                        <button onclick="fillPrompt('ช่วยค้นหาเทรนด์การออกแบบเว็บปี 2024-2025 ให้หน่อย')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-pink-600 hover:text-white hover:border-pink-500 transition shadow-sm flex items-center gap-1">
+                            <span>🔍</span> เทรนด์เว็บ 2024
+                        </button>
+                        <button onclick="fillPrompt('ช่วยหาตัวอย่างพอร์ตโฟลิโอสาย Web Developer เจ๋งๆ จากอินเทอร์เน็ต')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-violet-600 hover:text-white hover:border-violet-500 transition shadow-sm flex items-center gap-1">
+                            <span>🌐</span> ตัวอย่างพอร์ต Dev
+                        </button>
+                        <button onclick="fillPrompt('ช่วยร่างโครงสร้างเนื้อหาสำหรับหน้า Portfolio ของฉัน')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 transition shadow-sm flex items-center gap-1">
+                            <span>📝</span> ร่างเนื้อหาพอร์ต
+                        </button>
+                        <button onclick="fillPrompt('เขียนโค้ด HTML/Tailwind สำหรับส่วน Hero Section เท่ๆ')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-emerald-600 hover:text-white hover:border-emerald-500 transition shadow-sm flex items-center gap-1">
+                            <span>💻</span> ขอโค้ด Hero Section
+                        </button>
                     </div>
                 </div>
 
@@ -543,8 +553,10 @@
         window.addEventListener('load', () => {
             const loader = document.getElementById('page-loader');
             if(loader) {
-                loader.style.opacity = '0';
-                setTimeout(() => loader.style.display = 'none', 500);
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 300);
+                }, 300);
             }
             
             // Initialize Icons
@@ -644,7 +656,7 @@
         function updateContent() {
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (translations[currentLang] && translations[currentLang][key]) {
+                if (translations[currentLang][key]) {
                     el.innerText = translations[currentLang][key];
                 }
             });
@@ -764,9 +776,41 @@
         function loadChatHistory() {
             if (chatHistory.length > 0) {
                 messagesContainer.innerHTML = ''; 
+                
+                // If we have history, we might want to hide the default welcome message
+                // but keep structure consistent.
+                // However, user specifically asked for chips BELOW welcome message.
+                // If we reload history, typically we replace everything.
+                // Let's re-render welcome message + chips + history?
+                // Or just history.
+                
+                // Let's stick to appending history for now to be safe, 
+                // but we need to ensure the Chips are hidden if user has chatted?
+                // Actually, if history exists, usually we just show history.
+                // But the user's design shows chips under welcome message.
+                // So let's re-create that structure.
+                
+                const welcomeHtml = `
+                    <div class="flex gap-3">
+                        <div class="bot-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden">ต</div>
+                        <div class="bg-slate-800 text-slate-200 p-4 rounded-2xl rounded-tl-none max-w-[85%] border border-slate-700 shadow-md">
+                            <p data-i18n="welcome_msg">${translations[currentLang].welcome_msg}</p>
+                            <p class="mt-2 text-slate-300 text-sm" data-i18n="welcome_sub">${translations[currentLang].welcome_sub}</p>
+                        </div>
+                    </div>
+                    <!-- Chips hidden if history exists? Usually yes -->
+                `;
+                
+                messagesContainer.innerHTML = welcomeHtml;
+
+                // If history exists, we probably don't need chips, or maybe we do?
+                // Let's hide chips if there is history to keep it clean, as chips are usually "starters".
+                // But if you want chips to stay, remove the 'hidden' class logic in addMessage.
+                
                 chatHistory.forEach(msg => {
                     renderMessage(msg.content, msg.isUser, msg.imageUrl);
                 });
+                
                 setTimeout(() => {
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 }, 100);
