@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้ | AI Friend & Creator</title>
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Scripts (Defer for better performance) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600;700&family=Nunito:wght@400;600;700&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Add Sarabun for Thai language support */
+        body {
+            font-family: 'Nunito', 'Sarabun', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        h1, h2, h3, .brand-font {
+            font-family: 'Fredoka', 'Sarabun', sans-serif;
+        }
+        
+        /* Optimized Blobs */
+        .blob {
+            position: absolute;
+            filter: blur(60px); /* Reduced blur for performance */
+            z-index: -1;
+            opacity: 0.5;
+            animation: float 10s infinite ease-in-out;
+            will-change: transform; /* Hint to browser for optimization */
+        }
+        
+        /* Loading Screen */
+        #page-loader {
+            position: fixed;
+            inset: 0;
+            background-color: #0f172a;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 1rem;
+            transition: opacity 0.5s ease-out, visibility 0.5s;
+        }
+        
+        /* Animation for Glowing Text Shadow */
+        .text-glow-anim {
+            animation: text-flicker 3s infinite alternate;
+        }
+        @keyframes text-flicker {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.3)); }
+            50% { filter: drop-shadow(0 0 25px rgba(139, 92, 246, 0.6)); }
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(20px, -20px) scale(1.1); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+        
+        .chat-container {
+            scrollbar-width: thin;
+            scrollbar-color: #475569 #1e293b;
+        }
+        .chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-container::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background-color: #475569;
+            border-radius: 20px;
+        }
+        .typing-dot {
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        
+        /* Enhanced Markdown Styling */
+        .prose p { margin-bottom: 0.5rem; }
+        .prose ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.5rem; }
+        .prose ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.5rem; }
+        .prose code { background: #1e293b; padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #e2e8f0; font-size: 0.9em; }
+        .prose pre { background: #0f172a; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 0.5rem; border: 1px solid #334155; }
+        .prose pre code { background: transparent; padding: 0; color: #a5b4fc; }
+        .prose strong { color: #f472b6; font-weight: bold; }
+        .prose h1, .prose h2, .prose h3 { color: #fff; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem; }
+        .prose a { color: #38bdf8; text-decoration: underline; }
+        .prose blockquote { border-left: 4px solid #475569; padding-left: 1rem; color: #94a3b8; font-style: italic; }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        
+        /* Navigation Active State */
+        .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.3);
+        }
+        .nav-btn-active {
+            background: linear-gradient(to right, #db2777, #7c3aed) !important;
+            color: white !important;
+            box-shadow: 0 10px 15px -3px rgba(219, 39, 119, 0.3) !important;
+        }
+        
+        /* Fade transition for views */
+        .view-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            width: 100%;
+        }
+        .view-section.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* Mobile Menu Animation */
+        #mobile-menu {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            transform-origin: top;
+        }
+        #mobile-menu.hidden-menu {
+            transform: scaleY(0);
+            opacity: 0;
+            height: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative overflow-x-hidden">
+
+    <!-- Loading Screen -->
+    <div id="page-loader">
+        <div class="w-16 h-16 rounded-full border-4 border-slate-700 border-t-pink-500 animate-spin"></div>
+        <p class="text-slate-400 text-sm animate-pulse">กำลังโหลด...</p>
+    </div>
+
+    <!-- Background Blobs -->
+    <div class="blob bg-purple-600 w-96 h-96 rounded-full top-0 left-0 -translate-x-1/2 -translate-y-1/2"></div>
+    <div class="blob bg-blue-600 w-80 h-80 rounded-full bottom-0 right-0 translate-x-1/3 translate-y-1/3"></div>
+
+    <!-- Auth Modal (Login/Signup) -->
+    <div id="auth-modal" class="modal">
+        <div class="bg-slate-800 p-8 rounded-3xl border border-slate-600 w-full max-w-md shadow-2xl m-4 relative overflow-hidden">
+            <!-- Decorative Blobs inside modal -->
+            <div class="absolute top-0 right-0 w-32 h-32 bg-pink-500/20 blur-3xl rounded-full pointer-events-none"></div>
+            <div class="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/20 blur-3xl rounded-full pointer-events-none"></div>
+
+            <!-- Login Form -->
+            <div id="login-form" class="relative z-10">
+                <h3 class="text-2xl font-bold mb-2 text-white text-center" data-i18n="login_title">Welcome Back</h3>
+                <p class="text-slate-400 text-center mb-6 text-sm" data-i18n="login_subtitle">Enter your details to sign in</p>
+                
+                <!-- Google Sign-In Button (Mock) -->
+                <button onclick="handleGoogleLogin()" class="w-full py-3 bg-white text-slate-700 rounded-xl font-bold shadow-lg hover:bg-slate-100 transition transform hover:scale-[1.02] flex items-center justify-center gap-3 mb-4">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M23.766 12.2764C23.766 11.4607 23.6999 10.6406 23.5588 9.83807H12.24V14.4591H18.7217C18.4528 15.9494 17.5885 17.2678 16.323 18.1056V21.1039H20.19C22.4608 19.0139 23.766 15.9274 23.766 12.2764Z" fill="#4285F4"/>
+                        <path d="M12.2401 24.0008C15.4766 24.0008 18.2059 22.9382 20.1945 21.1039L16.3275 18.1055C15.2517 18.8375 13.8627 19.252 12.2445 19.252C9.11388 19.252 6.45946 17.1399 5.50705 14.3003H1.5166V17.3912C3.55371 21.4434 7.7029 24.0008 12.2401 24.0008Z" fill="#34A853"/>
+                        <path d="M5.50253 14.3003C5.00236 12.8099 5.00236 11.1961 5.50253 9.70575V6.61481H1.51649C-0.18551 10.0056 -0.18551 14.0004 1.51649 17.3912L5.50253 14.3003Z" fill="#FBBC05"/>
+                        <path d="M12.2401 4.74966C13.9509 4.7232 15.6044 5.36697 16.8434 6.54867L20.2695 3.12262C18.1001 1.0855 15.2208 -0.034466 12.2401 0.000808666C7.7029 0.000808666 3.55371 2.55822 1.5166 6.61481L5.50264 9.70575C6.45064 6.86173 9.10947 4.74966 12.2401 4.74966Z" fill="#EA4335"/>
+                    </svg>
+                    <span>Sign in with Google</span>
+                </button>
+
+                <div class="relative flex py-2 items-center">
+                    <div class="flex-grow border-t border-slate-600"></div>
+                    <span class="flex-shrink-0 mx-4 text-slate-500 text-xs">Or continue with email</span>
+                    <div class="flex-grow border-t border-slate-600"></div>
+                </div>
+                
+                <form onsubmit="handleLogin(event)" class="space-y-4 mt-4">
+                    <div>
+                        <label class="block text-slate-400 text-xs mb-1 ml-1">Email</label>
+                        <input type="email" id="login-email" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="name@example.com">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 text-xs mb-1 ml-1">Password</label>
+                        <input type="password" id="login-password" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white rounded-xl font-bold shadow-lg shadow-pink-500/25 transition transform hover:scale-[1.02]">
+                        <span data-i18n="btn_login">Sign In</span>
+                    </button>
+                </form>
+                
+                <p class="text-center mt-6 text-slate-400 text-sm">
+                    Don't have an account? <button onclick="toggleAuthMode('signup')" class="text-pink-400 hover:text-pink-300 font-bold ml-1">Sign Up</button>
+                </p>
+            </div>
+
+            <!-- Sign Up Form (Hidden by default) -->
+            <div id="signup-form" class="hidden relative z-10">
+                <h3 class="text-2xl font-bold mb-2 text-white text-center" data-i18n="signup_title">Create Account</h3>
+                <p class="text-slate-400 text-center mb-6 text-sm" data-i18n="signup_subtitle">Join us and start creating</p>
+                
+                <form onsubmit="handleSignup(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-slate-400 text-xs mb-1 ml-1">Full Name</label>
+                        <input type="text" id="signup-name" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="John Doe">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 text-xs mb-1 ml-1">Email</label>
+                        <input type="email" id="signup-email" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="name@example.com">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 text-xs mb-1 ml-1">Password</label>
+                        <input type="password" id="signup-password" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="Create a password">
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white rounded-xl font-bold shadow-lg shadow-pink-500/25 transition transform hover:scale-[1.02]">
+                        <span data-i18n="btn_signup">Create Account</span>
+                    </button>
+                </form>
+                
+                <p class="text-center mt-6 text-slate-400 text-sm">
+                    Already have an account? <button onclick="toggleAuthMode('login')" class="text-pink-400 hover:text-pink-300 font-bold ml-1">Log In</button>
+                </p>
+            </div>
+
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- NEW: Confirmation Modal (To replace browser confirm) -->
+    <div id="confirm-modal" class="modal">
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-600 w-full max-w-sm shadow-2xl m-4 text-center">
+            <div class="w-16 h-16 bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4 text-orange-400">
+                <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2 text-white" id="confirm-title">Are you sure?</h3>
+            <p class="text-slate-400 text-sm mb-6" id="confirm-message">This action cannot be undone.</p>
+            
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeConfirmModal()" class="px-5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white transition font-medium">
+                    Cancel
+                </button>
+                <button id="confirm-yes-btn" class="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white transition font-medium shadow-lg shadow-red-600/20">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Input for Avatar Upload -->
+    <input type="file" id="avatar-upload" class="hidden" accept="image/*" onchange="handleAvatarUpload(event)">
+
+    <!-- Header -->
+    <nav class="w-full p-4 md:p-6 flex flex-col z-20 sticky top-0 backdrop-blur-sm bg-slate-900/10 transition-all">
+        <div class="flex justify-between items-center w-full">
+            <!-- Brand -->
+            <div onclick="navigateTo('home')" class="cursor-pointer text-xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 brand-font py-1 leading-relaxed" data-i18n="brand_nav">
+                CTC
+            </div>
+
+            <!-- Desktop Navigation Capsule -->
+            <div class="hidden md:flex items-center gap-1 bg-slate-900/40 p-1.5 rounded-full border border-slate-700/50 backdrop-blur-md shadow-xl ring-1 ring-white/10">
+                <button onclick="navigateTo('home')" id="nav-home" class="nav-link px-6 py-2 rounded-full text-slate-300 font-medium hover:text-white hover:bg-white/10 transition-all duration-300 active" data-i18n="home">Home</button>
+                <button onclick="navigateTo('chat')" id="nav-chat" class="nav-link px-6 py-2 rounded-full text-slate-300 font-medium hover:text-white hover:bg-white/10 transition-all duration-300" data-i18n="ai_friend">AI Friend</button>
+            </div>
+
+            <!-- Right Side Controls -->
+            <div class="flex items-center gap-2 md:gap-3">
+                <button onclick="toggleLanguage()" class="flex items-center gap-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 px-3 py-1.5 md:px-4 md:py-2 rounded-full transition border border-slate-700 shadow-lg hover:shadow-xl">
+                    <span class="text-lg">🌐</span>
+                    <span id="lang-label" class="text-sm font-bold">TH</span>
+                </button>
+                
+                <!-- Auth Button (Desktop/Tablet) -->
+                <div id="auth-buttons-desktop" class="hidden md:block">
+                    <button onclick="openAuthModal()" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-full font-bold border border-slate-600 transition flex items-center gap-2 shadow-lg">
+                        <i data-lucide="user" class="w-4 h-4"></i> <span id="auth-btn-text">Login</span>
+                    </button>
+                </div>
+
+                <!-- User Profile Dropdown (Hidden by default) -->
+                <div id="user-profile-menu" class="hidden relative">
+                    <button onclick="toggleProfileMenu()" class="flex items-center gap-2 bg-slate-800/80 hover:bg-slate-700 pr-4 pl-1 py-1 rounded-full border border-slate-600 transition">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm" id="nav-user-avatar">U</div>
+                        <span class="text-sm font-bold text-white max-w-[100px] truncate" id="nav-user-name">User</span>
+                    </button>
+                    <!-- Dropdown -->
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden z-50">
+                        <div class="p-3 border-b border-slate-700">
+                            <p class="text-xs text-slate-400">Signed in as</p>
+                            <p class="text-sm font-bold text-white truncate" id="dropdown-email">user@example.com</p>
+                        </div>
+                        <button onclick="triggerClearChat()" class="w-full text-left px-4 py-3 text-slate-300 hover:bg-slate-700/50 hover:text-white text-sm transition flex items-center gap-2 border-b border-slate-700">
+                            <i data-lucide="message-square-off" class="w-4 h-4 text-orange-400"></i> Clear Chat
+                        </button>
+                        <button onclick="logout()" class="w-full text-left px-4 py-3 text-slate-300 hover:bg-slate-700/50 hover:text-white text-sm transition flex items-center gap-2 border-b border-slate-700">
+                            <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+                        </button>
+                        <button onclick="triggerDeleteAccount()" class="w-full text-left px-4 py-3 text-red-400 hover:bg-red-500/10 hover:text-red-300 text-sm transition flex items-center gap-2">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i> Delete Account
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Mobile Menu Toggle -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-slate-300 hover:text-white bg-slate-800/80 rounded-full border border-slate-700">
+                    <i data-lucide="menu" id="mobile-menu-icon" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden-menu md:hidden w-full mt-4 bg-slate-800/90 backdrop-blur-xl border border-slate-700/50 rounded-2xl overflow-hidden shadow-2xl">
+            <div class="flex flex-col p-2 space-y-1">
+                <button onclick="navigateTo('home'); toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl hover:bg-white/10 text-slate-200 font-medium transition flex items-center gap-3">
+                    <i data-lucide="home" class="w-5 h-5 text-pink-400"></i> <span data-i18n="home">Home</span>
+                </button>
+                <button onclick="navigateTo('chat'); toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl hover:bg-white/10 text-slate-200 font-medium transition flex items-center gap-3">
+                    <i data-lucide="message-circle" class="w-5 h-5 text-violet-400"></i> <span data-i18n="ai_friend">AI Friend</span>
+                </button>
+                
+                <div class="border-t border-slate-700/50 my-2"></div>
+                
+                <!-- Mobile Auth Buttons -->
+                <div id="auth-buttons-mobile">
+                    <button onclick="openAuthModal(); toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/10 text-slate-200 font-medium transition flex items-center gap-3">
+                        <i data-lucide="user" class="w-5 h-5 text-green-400"></i> Login / Sign Up
+                    </button>
+                </div>
+                <!-- Mobile Logged In Actions -->
+                <div id="auth-actions-mobile" class="hidden">
+                    <div class="px-4 py-2 text-xs text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                        <span id="mobile-user-name">User</span>'s Account
+                    </div>
+                    <button onclick="triggerClearChat(); toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 font-medium transition flex items-center gap-3">
+                        <i data-lucide="message-square-off" class="w-5 h-5 text-orange-400"></i> Clear Chat
+                    </button>
+                    <button onclick="logout(); toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 font-medium transition flex items-center gap-3">
+                        <i data-lucide="log-out" class="w-5 h-5"></i> Sign Out
+                    </button>
+                    <button onclick="triggerDeleteAccount(); toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl hover:bg-red-500/10 text-red-400 font-medium transition flex items-center gap-3">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i> Delete Account
+                    </button>
+                </div>
+
+                <div class="border-t border-slate-700/50 my-2"></div>
+                <div class="px-4 py-2 text-xs text-slate-500 uppercase tracking-widest">
+                    Quick Actions
+                </div>
+                <button onclick="document.getElementById('avatar-upload').click(); toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 font-medium transition flex items-center gap-3 text-sm">
+                    <i data-lucide="camera" class="w-4 h-4"></i> Change Avatar
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow container mx-auto px-4 py-4 md:py-8 z-10 w-full">
+        
+        <!-- VIEW: HOME (Introduction & Instructions) -->
+        <div id="view-home" class="view-section flex-col items-center gap-8 md:gap-16 active">
+        <!-- Hero Section -->
+        <section id="home" class="text-center max-w-3xl space-y-6 mt-4 md:mt-10">
+            <!-- Added shadow to the pill badge -->
+            <div class="inline-block px-4 py-1 rounded-full bg-slate-800 border border-slate-700 text-sm text-pink-400 mb-4 animate-bounce shadow-[0_0_15px_rgba(236,72,153,0.3)]" data-i18n="meet_companion">
+                ✨ Meet your new AI Companion
+            </div>
+            <!-- Increased line-height and padding to fix Thai vowel clipping -->
+            <h1 class="text-4xl md:text-6xl font-bold leading-[1.6] md:leading-[1.6] py-4">
+                <!-- Added white glow to "Hey, I'm" -->
+                <span class="drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]" data-i18n="hero_title_prefix">Hey, I'm</span> 
+                <!-- Added colored glow animation to Brand Name -->
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 inline-block text-glow-anim" data-i18n="brand_name">ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้</span>
+            </h1>
+            <p class="text-xl text-slate-400 drop-shadow-md" data-i18n="hero_desc">
+                A digital creator and your personal AI friend. Let's talk about ideas, code, or just vibe. Drop an image, ask a question, and let's create something cool.
+            </p>
+            
+            <!-- Added intense glow to the button -->
+            <button onclick="navigateTo('chat')" class="mt-8 px-8 py-4 bg-gradient-to-r from-pink-600 to-violet-600 text-white rounded-full font-bold text-lg shadow-[0_0_30px_rgba(236,72,153,0.4)] hover:scale-105 hover:shadow-[0_0_50px_rgba(236,72,153,0.7)] transition-all duration-300" data-i18n="start_chatting_btn">
+                Start Chatting Now 🚀
+            </button>
+        </section>
+
+        <!-- Instructions / Features Grid -->
+            <section class="w-full max-w-5xl mt-8 md:mt-12 pb-20">
+                <h2 class="text-2xl font-bold text-center mb-8 text-white border-b border-slate-700 pb-4 inline-block mx-auto" data-i18n="how_to_use">How to use / Features</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Feature 1 -->
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-pink-500/50 transition duration-300">
+                        <div class="w-12 h-12 bg-pink-500/20 rounded-xl flex items-center justify-center mb-4 text-pink-400">
+                            <i data-lucide="message-circle" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white" data-i18n="feat_chat_title">Smart Chat</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="feat_chat_desc">
+                            Ask me anything! From coding help to creative writing, or just a friendly conversation. I'm here to assist.
+                        </p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-violet-500/50 transition duration-300">
+                        <div class="w-12 h-12 bg-violet-500/20 rounded-xl flex items-center justify-center mb-4 text-violet-400">
+                            <i data-lucide="image" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white" data-i18n="feat_image_title">Image Analysis</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="feat_image_desc">
+                            Upload an image in the chat, and I can describe it, extract text, or answer questions about it.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- VIEW: CHAT INTERFACE -->
+        <div id="view-chat" class="view-section flex-col items-center">
+            <!-- Responsive Height: 80vh on mobile, 750px on desktop -->
+            <section class="w-full max-w-4xl bg-slate-900/80 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[80vh] md:h-[750px]">
+                <!-- Chat Header -->
+                <div class="bg-slate-800 p-4 flex items-center gap-4 border-b border-slate-700">
+                    <button onclick="navigateTo('home')" class="md:hidden text-slate-400 hover:text-white mr-2">
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                    </button>
+                    <!-- Avatar Container with Click Handler -->
+                    <div class="relative group cursor-pointer" onclick="document.getElementById('avatar-upload').click()" title="Click to change avatar">
+                        <div id="header-avatar" class="w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex items-center justify-center text-xl font-bold text-white shadow-lg overflow-hidden border border-slate-600">
+                            ต
+                        </div>
+                        <!-- Hover Camera Icon -->
+                        <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i data-lucide="camera" class="w-4 h-4 text-white"></i>
+                        </div>
+                        <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-800"></div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg" data-i18n="brand_name">ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้</h3>
+                        <p class="text-xs text-slate-400 flex items-center gap-1">
+                            <!-- Added ID to status text for dynamic updates -->
+                            <i id="status-icon" data-lucide="zap" class="w-3 h-3 text-yellow-400"></i> <span id="bot-status-text" data-i18n="online_ready">Online & Ready</span>
+                        </p>
+                    </div>
+                    <!-- Clear Chat Button Desktop -->
+                    <button onclick="triggerClearChat()" class="ml-auto hidden md:flex items-center gap-2 text-slate-400 hover:text-orange-400 transition" title="Clear Chat History">
+                        <i data-lucide="message-square-off" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Messages Area -->
+                <div id="messages" class="flex-1 p-4 md:p-6 overflow-y-auto chat-container space-y-4 bg-slate-900/50">
+                    <!-- Suggestion Chips (Updated for Portfolio & Search context) -->
+                    <div id="suggestion-chips" class="flex flex-wrap gap-2 justify-center py-4 px-2 mb-2">
+                        <button onclick="fillPrompt('ช่วยค้นหาเทรนด์การออกแบบเว็บปี 2024-2025 ให้หน่อย')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-pink-600 hover:text-white hover:border-pink-500 transition shadow-sm">🔍 เทรนด์เว็บ 2024</button>
+                        <button onclick="fillPrompt('ช่วยหาตัวอย่างพอร์ตโฟลิโอสาย Web Developer เจ๋งๆ จากอินเทอร์เน็ต')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-violet-600 hover:text-white hover:border-violet-500 transition shadow-sm">🌐 ตัวอย่างพอร์ต Dev</button>
+                        <button onclick="fillPrompt('ช่วยร่างโครงสร้างเนื้อหาสำหรับหน้า Portfolio ของฉัน')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 transition shadow-sm">📝 ร่างเนื้อหาพอร์ต</button>
+                        <button onclick="fillPrompt('เขียนโค้ด HTML/Tailwind สำหรับส่วน Hero Section เท่ๆ')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-emerald-600 hover:text-white hover:border-emerald-500 transition shadow-sm">💻 ขอโค้ด Hero Section</button>
+                    </div>
+                    
+                    <!-- Welcome Message -->
+                    <div class="flex gap-3">
+                        <div class="bot-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden">ต</div>
+                        <div class="bg-slate-800 text-slate-200 p-4 rounded-2xl rounded-tl-none max-w-[85%] border border-slate-700 shadow-md">
+                            <p data-i18n="welcome_msg">Hello! I'm ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้. 👋</p>
+                            <p class="mt-2 text-slate-300 text-sm" data-i18n="welcome_sub">You can send me text messages or upload images for me to analyze. How can I help you today?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Preview Area -->
+                <div id="image-preview-container" class="hidden px-4 pt-2 bg-slate-800/50 border-t border-slate-700">
+                    <div class="relative inline-block">
+                        <img id="image-preview" src="" alt="Preview" class="h-20 rounded-lg border border-slate-600 shadow-sm">
+                        <button onclick="clearImage()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition shadow-sm">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="p-3 md:p-4 bg-slate-800 border-t border-slate-700">
+                    <form id="chat-form" class="flex gap-2 items-end">
+                        <!-- File Input (Hidden) -->
+                        <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+                        
+                        <button type="button" onclick="document.getElementById('file-input').click()" class="p-3 text-slate-400 hover:text-pink-400 hover:bg-slate-700 rounded-xl transition" title="Upload Image">
+                            <i data-lucide="image-plus" class="w-6 h-6"></i>
+                        </button>
+                        
+                        <div class="flex-grow relative">
+                            <textarea 
+                                id="user-input" 
+                                rows="1"
+                                placeholder="Type a message..." 
+                                class="w-full bg-slate-900 text-white border-0 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 resize-none outline-none placeholder-slate-500"
+                                style="min-height: 48px; max-height: 120px;"
+                                onkeydown="handleEnter(event)"
+                            ></textarea>
+                        </div>
+
+                        <button type="submit" id="send-btn" class="p-3 bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white rounded-xl shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i data-lucide="send-horizontal" class="w-6 h-6"></i>
+                        </button>
+                    </form>
+                    <div class="text-center mt-2">
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest" data-i18n="powered_by">Powered by n8n Webhook</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <footer class="text-center p-8 text-slate-500 text-sm z-10" data-i18n="footer">
+        &copy; 2024 ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้. All rights reserved.
+    </footer>
+
+    <script>
+        // Wait for page load
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('page-loader');
+            if(loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+            }
+            
+            // Initialize Icons
+            if(typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            
+            // Initialize App
+            updateContent();
+            loadChatHistory();
+        });
+
+        // --- Mobile Menu Logic ---
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('mobile-menu-icon');
+            
+            if (menu.classList.contains('hidden-menu')) {
+                menu.classList.remove('hidden-menu');
+                icon.setAttribute('data-lucide', 'x');
+            } else {
+                menu.classList.add('hidden-menu');
+                icon.setAttribute('data-lucide', 'menu');
+            }
+            lucide.createIcons();
+        }
+
+        // --- Multi-language Support (RESTORED) ---
+        const translations = {
+            en: {
+                home: "Home",
+                about: "About",
+                ai_friend: "AI Friend",
+                chat_now: "Chat Now",
+                meet_companion: "✨ Meet your new AI Companion",
+                hero_title_prefix: "Hey, I'm",
+                hero_desc: "A digital creator and your personal AI friend. Let's talk about ideas, code, or just vibe. Drop an image, ask a question, and let's create something cool.",
+                brand_nav: "CTC", 
+                brand_name: "Genius Helper from a Smart Friend", 
+                online_ready: "Online & Ready",
+                welcome_msg: "Hello! I'm Genius Helper from a Smart Friend. 👋",
+                welcome_sub: "You can send me text messages or upload images for me to analyze. How can I help you today?",
+                placeholder_input: "Type a message...",
+                powered_by: "Powered by n8n Webhook",
+                footer: "© 2024 Genius Helper from a Smart Friend. All rights reserved.",
+                error_msg: "⚠️ Oops! Something went wrong connecting to the AI. Please try again.",
+                you: "You",
+                start_chatting_btn: "Start Chatting Now 🚀",
+                how_to_use: "How to use / Features",
+                feat_chat_title: "Smart Chat",
+                feat_chat_desc: "Ask me anything! From coding help to creative writing, or just a friendly conversation.",
+                feat_image_title: "Image Analysis",
+                feat_image_desc: "Upload an image in the chat, and I can describe it, extract text, or answer questions about it.",
+                login_title: "Welcome Back",
+                login_subtitle: "Enter your details to sign in",
+                btn_login: "Sign In",
+                signup_title: "Create Account",
+                signup_subtitle: "Join us and start creating",
+                btn_signup: "Create Account"
+            },
+            th: {
+                home: "หน้าแรก",
+                about: "เกี่ยวกับ",
+                ai_friend: "เพื่อน AI",
+                chat_now: "เริ่มแชท",
+                meet_companion: "✨ พบกับเพื่อน AI คนใหม่ของคุณ",
+                hero_title_prefix: "สวัสดีครับ ผม",
+                hero_desc: "นักสร้างสรรค์ดิจิทัลและเพื่อน AI ส่วนตัวของคุณ มาคุยเรื่องไอเดีย เขียนโค้ด หรือแค่นั่งคุยเล่น ส่งรูป ถามคำถาม แล้วมาสร้างสรรค์อะไรเจ๋งๆ กันเถอะ",
+                brand_nav: "CTC", 
+                brand_name: "ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้", 
+                online_ready: "ออนไลน์ & พร้อมใช้งาน",
+                welcome_msg: "สวัสดีครับ! ผม ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้ ครับ 👋",
+                welcome_sub: "คุณสามารถส่งข้อความหรืออัปโหลดรูปภาพให้ผมวิเคราะห์ได้เลย วันนี้ให้ผมช่วยอะไรดีครับ?",
+                placeholder_input: "พิมพ์ข้อความที่นี่...",
+                powered_by: "ขับเคลื่อนโดย n8n Webhook",
+                footer: "© 2024 ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้. สงวนลิขสิทธิ์",
+                error_msg: "⚠️ อุ๊ย! เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง",
+                you: "คุณ",
+                start_chatting_btn: "เริ่มแชทเลย 🚀",
+                how_to_use: "วิธีใช้งาน / ฟีเจอร์เด่น",
+                feat_chat_title: "แชทอัจฉริยะ",
+                feat_chat_desc: "ถามอะไรก็ได้! ตั้งแต่เรื่องโค้ด เขียนบทความ หรือแค่คุยเล่นแก้เหงา ผมพร้อมคุยครับ",
+                feat_image_title: "วิเคราะห์รูปภาพ",
+                feat_image_desc: "ส่งรูปมาให้ผมดู ผมช่วยบรรยายรูป อ่านข้อความในภาพ หรือตอบคำถามเกี่ยวกับภาพนั้นได้",
+                login_title: "ยินดีต้อนรับกลับ",
+                login_subtitle: "กรอกข้อมูลเพื่อเข้าสู่ระบบ",
+                btn_login: "เข้าสู่ระบบ",
+                signup_title: "สร้างบัญชีใหม่",
+                signup_subtitle: "มาร่วมสร้างสรรค์ไปกับเรา",
+                btn_signup: "สมัครสมาชิก"
+            }
+        };
+
+        // Load language preference
+        let currentLang = localStorage.getItem('app_language') || 'en';
+
+        function updateContent() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang] && translations[currentLang][key]) {
+                    el.innerText = translations[currentLang][key];
+                }
+            });
+
+            const userInput = document.getElementById('user-input');
+            if(userInput && translations[currentLang]) userInput.placeholder = translations[currentLang].placeholder_input;
+
+            const langLabel = document.getElementById('lang-label');
+            if(langLabel) langLabel.innerText = currentLang === 'en' ? 'TH' : 'EN';
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'th' : 'en';
+            localStorage.setItem('app_language', currentLang);
+            updateContent();
+        }
+
+        // --- Avatar Management ---
+        let botAvatarUrl = localStorage.getItem('bot_avatar');
+
+        function loadAvatar() {
+            if (botAvatarUrl) {
+                const headerAvatar = document.getElementById('header-avatar');
+                if (headerAvatar) {
+                    headerAvatar.innerHTML = `<img src="${botAvatarUrl}" class="w-full h-full object-cover">`;
+                }
+                document.querySelectorAll('.bot-avatar').forEach(el => {
+                    el.innerHTML = `<img src="${botAvatarUrl}" class="w-full h-full object-cover">`;
+                });
+            }
+        }
+
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    botAvatarUrl = e.target.result;
+                    try {
+                        localStorage.setItem('bot_avatar', botAvatarUrl);
+                    } catch(e) { console.error("Storage full"); }
+                    loadAvatar(); 
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        loadAvatar();
+
+        // --- Chat Logic ---
+        // Generate or Retrieve Session ID
+        let sessionId = localStorage.getItem('chat_session_id');
+        if (!sessionId) {
+            sessionId = crypto.randomUUID();
+            localStorage.setItem('chat_session_id', sessionId);
+        }
+
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
+        const fileInput = document.getElementById('file-input');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const sendBtn = document.getElementById('send-btn');
+        const messagesContainer = document.getElementById('messages');
+        const suggestionChips = document.getElementById('suggestion-chips');
+
+        // Webhook URL
+        const WEBHOOK_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://laassx.app.n8n.cloud/webhook/20f1e0a0-71ed-4fa0-a696-373e4c4f84eb/chat');
+
+        let selectedFile = null;
+
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            if(this.value === '') this.style.height = '48px';
+        });
+
+        function handleEnter(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                chatForm.dispatchEvent(new Event('submit'));
+            }
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedFile = file;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreviewContainer.classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function clearImage() {
+            selectedFile = null;
+            fileInput.value = '';
+            imagePreview.src = '';
+            imagePreviewContainer.classList.add('hidden');
+        }
+
+        let chatHistory = [];
+        try {
+            const stored = localStorage.getItem('chat_history');
+            if (stored) {
+                chatHistory = JSON.parse(stored);
+                if (!Array.isArray(chatHistory)) chatHistory = [];
+            }
+        } catch (e) {
+            localStorage.removeItem('chat_history');
+            chatHistory = [];
+        }
+
+        function loadChatHistory() {
+            if (chatHistory.length > 0) {
+                messagesContainer.innerHTML = ''; 
+                chatHistory.forEach(msg => {
+                    renderMessage(msg.content, msg.isUser, msg.imageUrl);
+                });
+                setTimeout(() => {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, 100);
+            }
+        }
+
+        function addMessage(content, isUser = false, imageUrl = null) {
+            chatHistory.push({ content, isUser, imageUrl });
+            try {
+                localStorage.setItem('chat_history', JSON.stringify(chatHistory));
+            } catch(e) {
+                console.warn("History storage failed (likely full)");
+            }
+            
+            if (isUser && suggestionChips) {
+                suggestionChips.classList.add('hidden');
+            }
+
+            renderMessage(content, isUser, imageUrl);
+        }
+
+        function addLoading() {
+            const id = 'loading-' + Date.now();
+            const wrapperDiv = document.createElement('div');
+            wrapperDiv.id = id;
+            wrapperDiv.className = 'flex gap-3';
+            
+            let avatarContent = 'ต';
+            if (botAvatarUrl) {
+                avatarContent = `<img src="${botAvatarUrl}" class="w-full h-full object-cover">`;
+            }
+
+            const thinkingText = currentLang === 'en' ? 'Thinking...' : 'กำลังคิด...';
+            
+            wrapperDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden bot-avatar">${avatarContent}</div>
+                <div class="bg-slate-800 p-4 rounded-2xl rounded-tl-none border border-slate-700 flex gap-3 items-center h-auto shadow-[0_0_15px_rgba(236,72,153,0.1)]">
+                    <div class="flex gap-1.5">
+                        <div class="typing-dot w-2.5 h-2.5 bg-gradient-to-r from-pink-500 to-pink-600 rounded-full shadow-sm"></div>
+                        <div class="typing-dot w-2.5 h-2.5 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full shadow-sm"></div>
+                        <div class="typing-dot w-2.5 h-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full shadow-sm"></div>
+                    </div>
+                    <span class="text-xs text-slate-400 animate-pulse font-medium">${thinkingText}</span>
+                </div>
+            `;
+            messagesContainer.appendChild(wrapperDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            return id;
+        }
+
+        function removeLoading(id) {
+            const element = document.getElementById(id);
+            if (element) element.remove();
+        }
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const text = userInput.value.trim();
+            if (!text && !selectedFile) return;
+
+            const currentText = text;
+            const currentFile = selectedFile;
+            
+            let previewUrl = null;
+            if (currentFile) {
+                if(imagePreview && imagePreview.src && imagePreview.src.startsWith('data:')) {
+                    previewUrl = imagePreview.src;
+                } else {
+                    previewUrl = URL.createObjectURL(currentFile);
+                }
+            }
+            addMessage(currentText, true, previewUrl);
+
+            userInput.value = '';
+            userInput.style.height = '48px';
+            clearImage();
+            
+            const originalBtnContent = sendBtn.innerHTML;
+            sendBtn.innerHTML = '<i data-lucide="loader-2" class="w-6 h-6 animate-spin text-white"></i>';
+            sendBtn.disabled = true;
+            lucide.createIcons();
+
+            const statusTextEl = document.getElementById('bot-status-text');
+            const statusIconEl = document.getElementById('status-icon');
+            if (statusTextEl) statusTextEl.innerText = currentLang === 'en' ? 'Processing...' : 'กำลังประมวลผล...';
+            if (statusIconEl) {
+                statusIconEl.classList.remove('text-yellow-400');
+                statusIconEl.classList.add('text-pink-500', 'animate-ping');
+            }
+
+            const loadingId = addLoading();
+
+            try {
+                const formData = new FormData();
+                formData.append('chatInput', currentText); 
+                formData.append('sessionId', sessionId); 
+                if (currentFile) {
+                    formData.append('file', currentFile); 
+                }
+
+                // Call Webhook
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('Network response was not ok');
+
+                const data = await response.json();
+                
+                let botResponse = "Received a response, but it was empty.";
+                
+                if (Array.isArray(data)) {
+                     if(data.length > 0) {
+                         botResponse = data[0].output || data[0].text || data[0].message || data[0].response || JSON.stringify(data[0]);
+                     }
+                } else if (typeof data === 'object') {
+                    botResponse = data.output || data.text || data.message || data.response || JSON.stringify(data);
+                } else {
+                    botResponse = String(data);
+                }
+
+                addMessage(botResponse);
+
+            } catch (error) {
+                console.error('Error:', error);
+                
+                setTimeout(() => {
+                    const fallbackMsg = currentLang === 'en' 
+                        ? "Server is busy/down, but I received: " + currentText 
+                        : "ขออภัยครับ ระบบ n8n มีปัญหาชั่วคราว แต่ผมได้รับข้อความแล้ว: " + currentText;
+                    
+                    addMessage("🤖 [Simulation] " + fallbackMsg);
+                }, 1000);
+
+            } finally {
+                removeLoading(loadingId);
+                
+                sendBtn.innerHTML = originalBtnContent;
+                sendBtn.disabled = false;
+                lucide.createIcons(); 
+
+                updateContent(); 
+                if (statusIconEl) {
+                    statusIconEl.classList.remove('text-pink-500', 'animate-ping');
+                    statusIconEl.classList.add('text-yellow-400');
+                }
+            }
+        });
+
+        // --- Auth System ---
+        let currentUser = null;
+        try {
+            currentUser = JSON.parse(localStorage.getItem('user_profile'));
+        } catch(e) {
+            console.error("User profile corrupt", e);
+        }
+
+        function openAuthModal() {
+            document.getElementById('auth-modal').classList.add('active');
+            toggleAuthMode('login'); // Default to login
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.remove('active');
+        }
+
+        function toggleAuthMode(mode) {
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            
+            if (mode === 'signup') {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+            } else {
+                signupForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+            }
+        }
+
+        // Mock Google Login Function
+        function handleGoogleLogin() {
+            const btn = document.querySelector('#login-form button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="animate-pulse">Connecting...</span>';
+            
+            setTimeout(() => {
+                currentUser = { 
+                    name: "User", 
+                    email: "user@example.com",
+                    isGoogle: true
+                };
+                localStorage.setItem('user_profile', JSON.stringify(currentUser));
+                
+                updateAuthUI();
+                closeAuthModal();
+                btn.innerHTML = originalText;
+                
+                const welcomeMsg = currentLang === 'en' ? `Welcome, ${currentUser.name}!` : `ยินดีต้อนรับคุณ ${currentUser.name}!`;
+                addMessage(welcomeMsg);
+            }, 1000);
+        }
+
+        function handleSignup(e) {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            
+            currentUser = { name, email };
+            localStorage.setItem('user_profile', JSON.stringify(currentUser));
+            
+            updateAuthUI();
+            closeAuthModal();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            if (!currentUser) {
+                const namePart = email.split('@')[0];
+                const name = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+                currentUser = { name, email };
+                localStorage.setItem('user_profile', JSON.stringify(currentUser));
+            }
+            updateAuthUI();
+            closeAuthModal();
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('user_profile');
+            updateAuthUI();
+            const dropdown = document.getElementById('profile-dropdown');
+            if(dropdown) dropdown.classList.add('hidden');
+            const logoutMsg = currentLang === 'en' ? "You have been logged out." : "คุณออกจากระบบเรียบร้อยแล้ว";
+            addMessage(logoutMsg);
+        }
+
+        function updateAuthUI() {
+            const authBtnDesktop = document.getElementById('auth-buttons-desktop');
+            const userProfileMenu = document.getElementById('user-profile-menu');
+            const authBtnMobile = document.getElementById('auth-buttons-mobile');
+            const authActionsMobile = document.getElementById('auth-actions-mobile');
+            
+            if (currentUser) {
+                // LOGGED IN STATE
+                if(authBtnDesktop) {
+                    authBtnDesktop.classList.remove('md:block'); 
+                    authBtnDesktop.classList.add('hidden');
+                }
+                if(userProfileMenu) userProfileMenu.classList.remove('hidden');
+                
+                document.getElementById('nav-user-name').innerText = currentUser.name;
+                
+                const avatarEl = document.getElementById('nav-user-avatar');
+                if (avatarEl) {
+                    if (currentUser.isGoogle) {
+                        avatarEl.style.background = 'linear-gradient(to right, #ec4899, #8b5cf6)'; 
+                        avatarEl.classList.remove('bg-gradient-to-tr', 'from-pink-500', 'to-violet-500');
+                    } else {
+                        avatarEl.style.background = '';
+                        avatarEl.classList.add('bg-gradient-to-tr', 'from-pink-500', 'to-violet-500');
+                    }
+                    avatarEl.innerText = currentUser.name.charAt(0).toUpperCase();
+                }
+                
+                document.getElementById('dropdown-email').innerText = currentUser.email;
+                
+                if(authBtnMobile) authBtnMobile.classList.add('hidden');
+                if(authActionsMobile) {
+                    authActionsMobile.classList.remove('hidden');
+                    document.getElementById('mobile-user-name').innerText = currentUser.name;
+                }
+            } else {
+                // LOGGED OUT STATE
+                if(authBtnDesktop) {
+                    authBtnDesktop.classList.remove('hidden');
+                    authBtnDesktop.classList.add('md:block');
+                }
+                if(userProfileMenu) userProfileMenu.classList.add('hidden');
+                
+                if(authBtnMobile) authBtnMobile.classList.remove('hidden');
+                if(authActionsMobile) authActionsMobile.classList.add('hidden');
+            }
+        }
+
+        function toggleProfileMenu() {
+            const dropdown = document.getElementById('profile-dropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        updateAuthUI();
+
+        // --- Custom Confirm Modal Logic ---
+        let confirmAction = null;
+
+        function showConfirmModal(title, message, action) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-message').innerText = message;
+            confirmAction = action;
+            document.getElementById('confirm-modal').classList.add('active');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-modal').classList.remove('active');
+            confirmAction = null;
+        }
+
+        const confirmYesBtn = document.getElementById('confirm-yes-btn');
+        if(confirmYesBtn) {
+            confirmYesBtn.addEventListener('click', function() {
+                if (confirmAction) confirmAction();
+                closeConfirmModal();
+            });
+        }
+
+        function triggerClearChat() {
+            const title = currentLang === 'en' ? 'Clear Chat History?' : 'ล้างประวัติแชท?';
+            const msg = currentLang === 'en' ? 'This will remove all messages from this device.' : 'ข้อความทั้งหมดในเครื่องนี้จะถูกลบ';
+            
+            showConfirmModal(title, msg, () => {
+                localStorage.removeItem('chat_history');
+                chatHistory = [];
+                window.location.reload();
+            });
+        }
+
+        function triggerDeleteAccount() {
+            const title = currentLang === 'en' ? 'Delete Account?' : 'ลบบัญชีผู้ใช้?';
+            const msg = currentLang === 'en' ? 'This will permanently delete your profile and all data.' : 'ข้อมูลโปรไฟล์และประวัติทั้งหมดจะถูกลบถาวร';
+            
+            showConfirmModal(title, msg, () => {
+                localStorage.clear();
+                currentUser = null;
+                updateAuthUI();
+                toggleProfileMenu();
+                addMessage(currentLang === 'en' ? "Account deleted." : "ลบบัญชีเรียบร้อยแล้ว");
+                setTimeout(() => window.location.reload(), 1000);
+            });
+        }
+
+        function renderMessage(content, isUser, imageUrl) {
+             const wrapperDiv = document.createElement('div');
+            wrapperDiv.className = `flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`;
+
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = `w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden ${isUser ? 'bg-slate-700 text-slate-300' : 'bg-gradient-to-tr from-pink-500 to-violet-600 bot-avatar'}`;
+            
+            // Handle User vs Bot Avatar Content
+            if (isUser) {
+                if (currentUser) {
+                    avatarDiv.innerText = currentUser.name.charAt(0).toUpperCase();
+                } else {
+                    avatarDiv.textContent = currentLang === 'en' ? 'You' : 'คุณ';
+                }
+            } else {
+                if (botAvatarUrl) {
+                    avatarDiv.innerHTML = `<img src="${botAvatarUrl}" class="w-full h-full object-cover">`;
+                } else {
+                    avatarDiv.innerText = 'ต';
+                }
+            }
+
+            const messageBubble = document.createElement('div');
+            messageBubble.className = `p-4 rounded-2xl max-w-[85%] shadow-md border ${
+                isUser 
+                ? 'bg-indigo-600 text-white border-indigo-500 rounded-tr-none' 
+                : 'bg-slate-800 text-slate-200 border-slate-700 rounded-tl-none prose'
+            }`;
+
+            if (imageUrl) {
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.className = "rounded-lg mb-2 max-h-48 border border-white/10";
+                img.onerror = function() { this.style.display = 'none'; };
+                messageBubble.appendChild(img);
+            }
+
+            if (content) {
+                const textDiv = document.createElement('div');
+                if (typeof marked !== 'undefined') {
+                    try {
+                        textDiv.innerHTML = marked.parse(content);
+                    } catch(e) {
+                        textDiv.innerHTML = content.replace(/\n/g, '<br>');
+                    }
+                } else {
+                    textDiv.innerHTML = content.replace(/\n/g, '<br>');
+                }
+                messageBubble.appendChild(textDiv);
+            }
+
+            wrapperDiv.appendChild(avatarDiv);
+            wrapperDiv.appendChild(messageBubble);
+            messagesContainer.appendChild(wrapperDiv);
+        }
+
+        // --- Suggestion Chips Logic ---
+        function fillPrompt(text) {
+            const input = document.getElementById('user-input');
+            input.value = text;
+            input.style.height = 'auto';
+            input.style.height = (input.scrollHeight) + 'px';
+            input.focus();
+        }
+
+        // --- View Navigation Logic ---
+        function navigateTo(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.remove('active');
+                setTimeout(() => {
+                    if(!el.classList.contains('active')) el.style.display = 'none';
+                }, 300); 
+            });
+
+            const selectedView = document.getElementById('view-' + viewId);
+            selectedView.style.display = 'flex';
+            setTimeout(() => {
+                selectedView.classList.add('active');
+            }, 10);
+
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('nav-btn-active'));
+            const activeBtn = document.getElementById('nav-' + viewId);
+            if(activeBtn) activeBtn.classList.add('nav-btn-active');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
