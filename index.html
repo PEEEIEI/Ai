@@ -34,8 +34,8 @@
             filter: blur(60px);
             z-index: -1;
             opacity: 0.5;
-            animation: float 10s infinite ease-in-out;
             will-change: transform;
+            animation: float 10s infinite ease-in-out;
         }
         
         /* Loading Screen */
@@ -91,13 +91,29 @@
             40% { transform: scale(1); }
         }
         
-        /* Enhanced Markdown Styling */
+        /* Enhanced Markdown Styling with Copy Button Support */
         .prose p { margin-bottom: 0.5rem; }
         .prose ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.5rem; }
         .prose ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.5rem; }
         .prose code { background: #1e293b; padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #e2e8f0; font-size: 0.9em; }
-        .prose pre { background: #0f172a; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 0.5rem; border: 1px solid #334155; }
-        .prose pre code { background: transparent; padding: 0; color: #a5b4fc; }
+        
+        /* Code Block Styling */
+        .prose pre { 
+            background: #0f172a; 
+            padding: 1rem; 
+            border-radius: 0.5rem; 
+            overflow-x: auto; 
+            margin-bottom: 0.5rem; 
+            border: 1px solid #334155; 
+            position: relative; /* Needed for absolute positioning of copy button */
+        }
+        
+        .prose pre code { 
+            background: transparent; 
+            padding: 0; 
+            color: #a5b4fc; 
+        }
+        
         .prose strong { color: #f472b6; font-weight: bold; }
         .prose h1, .prose h2, .prose h3 { color: #fff; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem; }
         .prose a { color: #38bdf8; text-decoration: underline; }
@@ -111,15 +127,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(15, 23, 42, 0.8);
+            background-color: rgba(15, 23, 42, 0.9);
             backdrop-filter: blur(5px);
             z-index: 100;
             justify-content: center;
             align-items: center;
         }
-        .modal.active {
-            display: flex;
-        }
+        .modal.active { display: flex; }
         
         /* Navigation Active State */
         .nav-link.active {
@@ -133,7 +147,7 @@
             box-shadow: 0 10px 15px -3px rgba(219, 39, 119, 0.3) !important;
         }
         
-        /* Fade transition for views */
+        /* View Switching */
         .view-section {
             display: none;
             opacity: 0;
@@ -144,23 +158,11 @@
             display: flex;
             opacity: 1;
         }
-
-        /* Mobile Menu Animation */
-        #mobile-menu {
-            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-            transform-origin: top;
-        }
-        #mobile-menu.hidden-menu {
-            transform: scaleY(0);
-            opacity: 0;
-            height: 0;
-            pointer-events: none;
-        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col relative overflow-x-hidden">
 
-    <!-- Loading Screen -->
+    <!-- Fast Loading Screen -->
     <div id="page-loader">
         <div class="w-16 h-16 rounded-full border-4 border-slate-700 border-t-pink-500 animate-spin"></div>
         <p class="text-slate-400 text-sm animate-pulse">กำลังโหลด...</p>
@@ -170,7 +172,7 @@
     <div class="blob bg-purple-600 w-96 h-96 rounded-full top-0 left-0 -translate-x-1/2 -translate-y-1/2"></div>
     <div class="blob bg-blue-600 w-80 h-80 rounded-full bottom-0 right-0 translate-x-1/3 translate-y-1/3"></div>
 
-    <!-- Auth Modal (Login/Signup) -->
+    <!-- Auth Modal -->
     <div id="auth-modal" class="modal">
         <div class="bg-slate-800 p-8 rounded-3xl border border-slate-600 w-full max-w-md shadow-2xl m-4 relative overflow-hidden">
             <!-- Decorative Blobs inside modal -->
@@ -182,32 +184,9 @@
                 <h3 class="text-2xl font-bold mb-2 text-white text-center" data-i18n="login_title">Welcome Back</h3>
                 <p class="text-slate-400 text-center mb-6 text-sm" data-i18n="login_subtitle">Enter your details to sign in</p>
                 
-                <!-- Google Sign-In Button (Mock) -->
-                <button onclick="handleGoogleLogin()" class="w-full py-3 bg-white text-slate-700 rounded-xl font-bold shadow-lg hover:bg-slate-100 transition transform hover:scale-[1.02] flex items-center justify-center gap-3 mb-4">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M23.766 12.2764C23.766 11.4607 23.6999 10.6406 23.5588 9.83807H12.24V14.4591H18.7217C18.4528 15.9494 17.5885 17.2678 16.323 18.1056V21.1039H20.19C22.4608 19.0139 23.766 15.9274 23.766 12.2764Z" fill="#4285F4"/>
-                        <path d="M12.2401 24.0008C15.4766 24.0008 18.2059 22.9382 20.1945 21.1039L16.3275 18.1055C15.2517 18.8375 13.8627 19.252 12.2445 19.252C9.11388 19.252 6.45946 17.1399 5.50705 14.3003H1.5166V17.3912C3.55371 21.4434 7.7029 24.0008 12.2401 24.0008Z" fill="#34A853"/>
-                        <path d="M5.50253 14.3003C5.00236 12.8099 5.00236 11.1961 5.50253 9.70575V6.61481H1.51649C-0.18551 10.0056 -0.18551 14.0004 1.51649 17.3912L5.50253 14.3003Z" fill="#FBBC05"/>
-                        <path d="M12.2401 4.74966C13.9509 4.7232 15.6044 5.36697 16.8434 6.54867L20.2695 3.12262C18.1001 1.0855 15.2208 -0.034466 12.2401 0.000808666C7.7029 0.000808666 3.55371 2.55822 1.5166 6.61481L5.50264 9.70575C6.45064 6.86173 9.10947 4.74966 12.2401 4.74966Z" fill="#EA4335"/>
-                    </svg>
-                    <span>Sign in with Google</span>
-                </button>
-
-                <div class="relative flex py-2 items-center">
-                    <div class="flex-grow border-t border-slate-600"></div>
-                    <span class="flex-shrink-0 mx-4 text-slate-500 text-xs">Or continue with email</span>
-                    <div class="flex-grow border-t border-slate-600"></div>
-                </div>
-                
                 <form onsubmit="handleLogin(event)" class="space-y-4 mt-4">
-                    <div>
-                        <label class="block text-slate-400 text-xs mb-1 ml-1">Email</label>
-                        <input type="email" id="login-email" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="name@example.com">
-                    </div>
-                    <div>
-                        <label class="block text-slate-400 text-xs mb-1 ml-1">Password</label>
-                        <input type="password" id="login-password" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="••••••••">
-                    </div>
+                    <input type="email" id="login-email" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="name@example.com">
+                    <input type="password" id="login-password" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="••••••••">
                     <button type="submit" class="w-full py-3 bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white rounded-xl font-bold shadow-lg shadow-pink-500/25 transition transform hover:scale-[1.02]">
                         <span data-i18n="btn_login">Sign In</span>
                     </button>
@@ -218,41 +197,27 @@
                 </p>
             </div>
 
-            <!-- Sign Up Form (Hidden by default) -->
+            <!-- Sign Up Form -->
             <div id="signup-form" class="hidden relative z-10">
                 <h3 class="text-2xl font-bold mb-2 text-white text-center" data-i18n="signup_title">Create Account</h3>
                 <p class="text-slate-400 text-center mb-6 text-sm" data-i18n="signup_subtitle">Join us and start creating</p>
-                
                 <form onsubmit="handleSignup(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-slate-400 text-xs mb-1 ml-1">Full Name</label>
-                        <input type="text" id="signup-name" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="John Doe">
-                    </div>
-                    <div>
-                        <label class="block text-slate-400 text-xs mb-1 ml-1">Email</label>
-                        <input type="email" id="signup-email" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="name@example.com">
-                    </div>
-                    <div>
-                        <label class="block text-slate-400 text-xs mb-1 ml-1">Password</label>
-                        <input type="password" id="signup-password" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="Create a password">
-                    </div>
+                    <input type="text" id="signup-name" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="John Doe">
+                    <input type="email" id="signup-email" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="name@example.com">
+                    <input type="password" id="signup-password" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="Create a password">
                     <button type="submit" class="w-full py-3 bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white rounded-xl font-bold shadow-lg shadow-pink-500/25 transition transform hover:scale-[1.02]">
                         <span data-i18n="btn_signup">Create Account</span>
                     </button>
                 </form>
-                
                 <p class="text-center mt-6 text-slate-400 text-sm">
                     Already have an account? <button onclick="toggleAuthMode('login')" class="text-pink-400 hover:text-pink-300 font-bold ml-1">Log In</button>
                 </p>
             </div>
-
-            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white transition">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
         </div>
     </div>
 
-    <!-- NEW: Confirmation Modal (To replace browser confirm) -->
+    <!-- Confirm Modal -->
     <div id="confirm-modal" class="modal">
         <div class="bg-slate-800 p-6 rounded-2xl border border-slate-600 w-full max-w-sm shadow-2xl m-4 text-center">
             <div class="w-16 h-16 bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4 text-orange-400">
@@ -260,14 +225,9 @@
             </div>
             <h3 class="text-xl font-bold mb-2 text-white" id="confirm-title">Are you sure?</h3>
             <p class="text-slate-400 text-sm mb-6" id="confirm-message">This action cannot be undone.</p>
-            
             <div class="flex gap-3 justify-center">
-                <button onclick="closeConfirmModal()" class="px-5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white transition font-medium">
-                    Cancel
-                </button>
-                <button id="confirm-yes-btn" class="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white transition font-medium shadow-lg shadow-red-600/20">
-                    Confirm
-                </button>
+                <button onclick="closeConfirmModal()" class="px-5 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white transition font-medium">Cancel</button>
+                <button id="confirm-yes-btn" class="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white transition font-medium shadow-lg shadow-red-600/20">Confirm</button>
             </div>
         </div>
     </div>
@@ -280,7 +240,7 @@
         <div class="flex justify-between items-center w-full">
             <!-- Brand -->
             <div onclick="navigateTo('home')" class="cursor-pointer text-xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 brand-font py-1 leading-relaxed" data-i18n="brand_nav">
-                CTC
+                HIT X CTC
             </div>
 
             <!-- Desktop Navigation Capsule -->
@@ -408,7 +368,7 @@
         </section>
 
         <!-- Instructions / Features Grid -->
-            <section class="w-full max-w-5xl mt-8 md:mt-12 pb-20">
+            <section class="w-full max-w-5xl mt-8 md:mt-12 pb-0">
                 <h2 class="text-2xl font-bold text-center mb-8 text-white border-b border-slate-700 pb-4 inline-block mx-auto" data-i18n="how_to_use">How to use / Features</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -435,12 +395,43 @@
                     </div>
                 </div>
             </section>
+
+            <!-- NEW: Steps Section -->
+            <section class="w-full max-w-5xl mt-12 mb-20 border-t border-slate-800 pt-12">
+                <h2 class="text-2xl font-bold text-center mb-8 text-white" data-i18n="steps_title">Get Started in 3 Steps</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Step 1: Web Dev -->
+                    <div class="bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50 flex flex-col items-center text-center hover:bg-slate-800/50 transition duration-300">
+                        <div class="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mb-4 text-blue-400 font-bold text-xl">
+                             <i data-lucide="code" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-white" data-i18n="step_1">Web Developer Expert</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="step_1_desc">Generate beautiful portfolios and modern websites with HTML/CSS code.</p>
+                    </div>
+                    <!-- Step 2: Info Research -->
+                    <div class="bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50 flex flex-col items-center text-center hover:bg-slate-800/50 transition duration-300">
+                        <div class="w-12 h-12 bg-pink-500/20 rounded-full flex items-center justify-center mb-4 text-pink-400 font-bold text-xl">
+                            <i data-lucide="search" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-white" data-i18n="step_2">Information Researcher</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="step_2_desc">Find real-time facts and summarize information from reliable sources.</p>
+                    </div>
+                    <!-- Step 3: Image Gen -->
+                    <div class="bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50 flex flex-col items-center text-center hover:bg-slate-800/50 transition duration-300">
+                        <div class="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mb-4 text-purple-400 font-bold text-xl">
+                            <i data-lucide="image" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-white" data-i18n="step_3">Image Generator</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="step_3_desc">Create stunning images from your imagination using DALL-E.</p>
+                    </div>
+                </div>
+            </section>
         </div>
 
         <!-- VIEW: CHAT INTERFACE -->
         <div id="view-chat" class="view-section flex-col items-center">
             <!-- Responsive Height: 80dvh for mobile browsers -->
-            <section class="w-full max-w-4xl bg-slate-900/80 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[80dvh] md:h-[750px]">
+            <section class="w-full max-w-6xl bg-slate-900/80 backdrop-blur-xl border-y border-slate-700 md:border md:rounded-3xl shadow-none md:shadow-2xl overflow-hidden flex flex-col h-[85dvh] md:h-[85vh]">
                 <!-- Chat Header -->
                 <div class="bg-slate-800 p-4 flex items-center gap-4 border-b border-slate-700">
                     <button onclick="navigateTo('home')" class="md:hidden text-slate-400 hover:text-white mr-2">
@@ -477,13 +468,12 @@
                     <div class="flex gap-3">
                         <div class="bot-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden">ต</div>
                         <div class="bg-slate-800 text-slate-200 p-4 rounded-2xl rounded-tl-none max-w-[85%] border border-slate-700 shadow-md">
-                            <p data-i18n="welcome_msg">Hello! I'm ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้. 👋</p>
+                            <p data-i18n="welcome_msg">Hello! I'm Genius Helper from a Smart Friend. 👋</p>
                             <p class="mt-2 text-slate-300 text-sm" data-i18n="welcome_sub">You can send me text messages or upload images for me to analyze. How can I help you today?</p>
                         </div>
                     </div>
 
-                    <!-- Suggestion Chips (Moved Below Welcome Message) -->
-                    <!-- UPDATED: Added responsive centering and margin control for mobile -->
+                    <!-- Suggestion Chips (Below Welcome Message) -->
                     <div id="suggestion-chips" class="flex flex-wrap gap-2 py-2 px-2 justify-center md:justify-start ml-0 md:ml-11">
                         <button onclick="fillPrompt('ช่วยค้นหาเทรนด์การออกแบบเว็บปี 2024-2025 ให้หน่อย')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-pink-600 hover:text-white hover:border-pink-500 transition shadow-sm flex items-center gap-1">
                             <span>🔍</span> เทรนด์เว็บ 2024
@@ -544,36 +534,107 @@
 
     </main>
 
-    <footer class="text-center p-8 text-slate-500 text-sm z-10" data-i18n="footer">
-        &copy; 2024 ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้. All rights reserved.
-    </footer>
-
     <script>
-        // Wait for page load
-        window.addEventListener('load', () => {
-            const loader = document.getElementById('page-loader');
-            if(loader) {
-                setTimeout(() => {
-                    loader.style.opacity = '0';
-                    setTimeout(() => loader.style.display = 'none', 300);
-                }, 300);
-            }
-            
-            // Initialize Icons
-            if(typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-            
-            // Initialize App
-            updateContent();
-            loadChatHistory();
-        });
+        // Global variables declared first
+        let currentLang = localStorage.getItem('app_language') || 'th';
+        let sessionId = localStorage.getItem('chat_session_id');
+        if (!sessionId) {
+            sessionId = crypto.randomUUID();
+            localStorage.setItem('chat_session_id', sessionId);
+        }
+        let chatHistory = [];
+        let currentUser = null;
+        let selectedFile = null;
+        let botAvatarUrl = localStorage.getItem('bot_avatar');
+        let confirmAction = null;
 
-        // --- Mobile Menu Logic ---
-        function toggleMobileMenu() {
+        try {
+            const userStr = localStorage.getItem('user_profile');
+            if (userStr) currentUser = JSON.parse(userStr);
+        } catch(e) { console.error("User profile corrupt", e); }
+
+        // Translations Data
+        const translations = {
+            en: {
+                home: "Home", about: "About", ai_friend: "AI Friend", chat_now: "Chat Now",
+                meet_companion: "✨ Meet your new AI Companion", hero_title_prefix: "Hey, I'm",
+                hero_desc: "A digital creator and your personal AI friend. Let's talk about ideas, code, or just vibe. Drop an image, ask a question, and let's create something cool.",
+                brand_nav: "HIT X CTC", brand_name: "Genius Helper from a Smart Friend", online_ready: "Online & Ready",
+                welcome_msg: "Hello! I'm Genius Helper from a Smart Friend. 👋",
+                welcome_sub: "You can send me text messages or upload images for me to analyze. How can I help you today?",
+                placeholder_input: "Type a message...", powered_by: "Powered by n8n Webhook",
+                footer: "© 2024 Genius Helper from a Smart Friend. All rights reserved.",
+                error_msg: "⚠️ Oops! Something went wrong connecting to the AI. Please try again.",
+                you: "You", start_chatting_btn: "Start Chatting Now 🚀", how_to_use: "How to use / Features",
+                feat_chat_title: "Smart Chat", feat_chat_desc: "Ask me anything! From coding help to creative writing.",
+                feat_image_title: "Image Analysis", feat_image_desc: "Upload an image in the chat, and I can describe it, extract text, or answer questions about it.",
+                login_title: "Welcome Back", login_subtitle: "Enter your details to sign in", btn_login: "Sign In",
+                signup_title: "Create Account", signup_subtitle: "Join us and start creating", btn_signup: "Create Account",
+                steps_title: "Get Started in 3 Steps", 
+                step_1: "Web Developer Expert", step_1_desc: "Generate beautiful portfolios and modern websites with HTML/CSS code.",
+                step_2: "Information Researcher", step_2_desc: "Find real-time facts and summarize information from reliable sources.",
+                step_3: "Image Generator", step_3_desc: "Create stunning images from your imagination using DALL-E."
+            },
+            th: {
+                home: "หน้าแรก", about: "เกี่ยวกับ", ai_friend: "เพื่อน AI", chat_now: "เริ่มแชท",
+                meet_companion: "✨ พบกับเพื่อน AI คนใหม่ของคุณ", hero_title_prefix: "สวัสดีครับ ผม",
+                hero_desc: "นักสร้างสรรค์ดิจิทัลและเพื่อน AI ส่วนตัวของคุณ มาคุยเรื่องไอเดีย เขียนโค้ด หรือแค่นั่งคุยเล่น ส่งรูป ถามคำถาม แล้วมาสร้างสรรค์อะไรเจ๋งๆ กันเถอะ",
+                brand_nav: "HIT X CTC", brand_name: "ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้", online_ready: "ออนไลน์ & พร้อมใช้งาน",
+                welcome_msg: "สวัสดีครับ! ผม ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้ ครับ 👋",
+                welcome_sub: "คุณสามารถส่งข้อความหรืออัปโหลดรูปภาพให้ผมวิเคราะห์ได้เลย วันนี้ให้ผมช่วยอะไรดีครับ?",
+                placeholder_input: "พิมพ์ข้อความที่นี่...", powered_by: "ขับเคลื่อนโดย n8n Webhook",
+                footer: "© 2024 ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้. สงวนลิขสิทธิ์",
+                error_msg: "⚠️ อุ๊ย! เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง",
+                you: "คุณ", start_chatting_btn: "เริ่มแชทเลย 🚀", how_to_use: "วิธีใช้งาน / ฟีเจอร์เด่น",
+                feat_chat_title: "แชทอัจฉริยะ", feat_chat_desc: "ถามอะไรก็ได้! ตั้งแต่เรื่องโค้ด เขียนบทความ หรือแค่คุยเล่นแก้เหงา",
+                feat_image_title: "วิเคราะห์รูปภาพ", feat_image_desc: "ส่งรูปมาให้ผมดู ผมช่วยบรรยายรูป อ่านข้อความในภาพได้",
+                login_title: "ยินดีต้อนรับกลับ", login_subtitle: "กรอกข้อมูลเพื่อเข้าสู่ระบบ", btn_login: "เข้าสู่ระบบ",
+                signup_title: "สร้างบัญชีใหม่", signup_subtitle: "มาร่วมสร้างสรรค์ไปกับเรา", btn_signup: "สมัครสมาชิก",
+                steps_title: "เริ่มต้นง่ายๆ ใน 3 ขั้นตอน", 
+                step_1: "ผู้เชี่ยวชาญด้านเว็บ", step_1_desc: "สร้างพอร์ตโฟลิโอและเว็บสวยๆ ด้วยโค้ด HTML/CSS ทันสมัย",
+                step_2: "นักสืบค้นข้อมูล", step_2_desc: "ค้นหาความจริง ข่าวสารล่าสุด และสรุปข้อมูลให้อ่านง่าย",
+                step_3: "นักสร้างสรรค์ภาพ", step_3_desc: "เนรมิตรูปภาพสวยๆ จากจินตนาการของคุณด้วย AI"
+            }
+        };
+
+        // --- Global Functions (Attached to window for HTML onclick) ---
+        
+        window.updateContent = function() {
+            const t = translations[currentLang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) el.innerText = t[key];
+            });
+            const userInput = document.getElementById('user-input');
+            if(userInput) userInput.placeholder = t.placeholder_input;
+            const langLabel = document.getElementById('lang-label');
+            if(langLabel) langLabel.innerText = currentLang === 'en' ? 'TH' : 'EN';
+        };
+
+        window.toggleLanguage = function() {
+            currentLang = currentLang === 'en' ? 'th' : 'en';
+            localStorage.setItem('app_language', currentLang);
+            updateContent();
+        };
+
+        window.navigateTo = function(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.remove('active');
+                setTimeout(() => { if(!el.classList.contains('active')) el.style.display = 'none'; }, 300);
+            });
+            const selected = document.getElementById('view-' + viewId);
+            selected.style.display = 'flex';
+            setTimeout(() => selected.classList.add('active'), 10);
+            
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('nav-btn-active'));
+            const activeBtn = document.getElementById('nav-' + viewId);
+            if(activeBtn) activeBtn.classList.add('nav-btn-active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.toggleMobileMenu = function() {
             const menu = document.getElementById('mobile-menu');
             const icon = document.getElementById('mobile-menu-icon');
-            
             if (menu.classList.contains('hidden-menu')) {
                 menu.classList.remove('hidden-menu');
                 icon.setAttribute('data-lucide', 'x');
@@ -581,215 +642,168 @@
                 menu.classList.add('hidden-menu');
                 icon.setAttribute('data-lucide', 'menu');
             }
-            lucide.createIcons();
-        }
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        };
 
-        // --- Multi-language Support (RESTORED) ---
-        const translations = {
-            en: {
-                home: "Home",
-                about: "About",
-                ai_friend: "AI Friend",
-                chat_now: "Chat Now",
-                meet_companion: "✨ Meet your new AI Companion",
-                hero_title_prefix: "Hey, I'm",
-                hero_desc: "A digital creator and your personal AI friend. Let's talk about ideas, code, or just vibe. Drop an image, ask a question, and let's create something cool.",
-                brand_nav: "CTC", 
-                brand_name: "Genius Helper from a Smart Friend", 
-                online_ready: "Online & Ready",
-                welcome_msg: "Hello! I'm Genius Helper from a Smart Friend. 👋",
-                welcome_sub: "You can send me text messages or upload images for me to analyze. How can I help you today?",
-                placeholder_input: "Type a message...",
-                powered_by: "Powered by n8n Webhook",
-                footer: "© 2024 Genius Helper from a Smart Friend. All rights reserved.",
-                error_msg: "⚠️ Oops! Something went wrong connecting to the AI. Please try again.",
-                you: "You",
-                start_chatting_btn: "Start Chatting Now 🚀",
-                how_to_use: "How to use / Features",
-                feat_chat_title: "Smart Chat",
-                feat_chat_desc: "Ask me anything! From coding help to creative writing, or just a friendly conversation.",
-                feat_image_title: "Image Analysis",
-                feat_image_desc: "Upload an image in the chat, and I can describe it, extract text, or answer questions about it.",
-                login_title: "Welcome Back",
-                login_subtitle: "Enter your details to sign in",
-                btn_login: "Sign In",
-                signup_title: "Create Account",
-                signup_subtitle: "Join us and start creating",
-                btn_signup: "Create Account"
-            },
-            th: {
-                home: "หน้าแรก",
-                about: "เกี่ยวกับ",
-                ai_friend: "เพื่อน AI",
-                chat_now: "เริ่มแชท",
-                meet_companion: "✨ พบกับเพื่อน AI คนใหม่ของคุณ",
-                hero_title_prefix: "สวัสดีครับ ผม",
-                hero_desc: "นักสร้างสรรค์ดิจิทัลและเพื่อน AI ส่วนตัวของคุณ มาคุยเรื่องไอเดีย เขียนโค้ด หรือแค่นั่งคุยเล่น ส่งรูป ถามคำถาม แล้วมาสร้างสรรค์อะไรเจ๋งๆ กันเถอะ",
-                brand_nav: "CTC", 
-                brand_name: "ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้", 
-                online_ready: "ออนไลน์ & พร้อมใช้งาน",
-                welcome_msg: "สวัสดีครับ! ผม ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้ ครับ 👋",
-                welcome_sub: "คุณสามารถส่งข้อความหรืออัปโหลดรูปภาพให้ผมวิเคราะห์ได้เลย วันนี้ให้ผมช่วยอะไรดีครับ?",
-                placeholder_input: "พิมพ์ข้อความที่นี่...",
-                powered_by: "ขับเคลื่อนโดย n8n Webhook",
-                footer: "© 2024 ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้. สงวนลิขสิทธิ์",
-                error_msg: "⚠️ อุ๊ย! เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง",
-                you: "คุณ",
-                start_chatting_btn: "เริ่มแชทเลย 🚀",
-                how_to_use: "วิธีใช้งาน / ฟีเจอร์เด่น",
-                feat_chat_title: "แชทอัจฉริยะ",
-                feat_chat_desc: "ถามอะไรก็ได้! ตั้งแต่เรื่องโค้ด เขียนบทความ หรือแค่คุยเล่นแก้เหงา ผมพร้อมคุยครับ",
-                feat_image_title: "วิเคราะห์รูปภาพ",
-                feat_image_desc: "ส่งรูปมาให้ผมดู ผมช่วยบรรยายรูป อ่านข้อความในภาพ หรือตอบคำถามเกี่ยวกับภาพนั้นได้",
-                login_title: "ยินดีต้อนรับกลับ",
-                login_subtitle: "กรอกข้อมูลเพื่อเข้าสู่ระบบ",
-                btn_login: "เข้าสู่ระบบ",
-                signup_title: "สร้างบัญชีใหม่",
-                signup_subtitle: "มาร่วมสร้างสรรค์ไปกับเรา",
-                btn_signup: "สมัครสมาชิก"
+        window.toggleProfileMenu = function() {
+            document.getElementById('profile-dropdown').classList.toggle('hidden');
+        };
+
+        window.openAuthModal = function() {
+            document.getElementById('auth-modal').classList.add('active');
+            toggleAuthMode('login');
+        };
+        window.closeAuthModal = function() { document.getElementById('auth-modal').classList.remove('active'); };
+        
+        window.toggleAuthMode = function(mode) {
+            const login = document.getElementById('login-form');
+            const signup = document.getElementById('signup-form');
+            if(mode === 'signup') { login.classList.add('hidden'); signup.classList.remove('hidden'); }
+            else { signup.classList.add('hidden'); login.classList.remove('hidden'); }
+        };
+
+        window.handleLogin = function(e) {
+            if(e) e.preventDefault();
+            const emailIn = document.getElementById('login-email').value;
+            const namePart = emailIn.split('@')[0];
+            currentUser = { name: namePart, email: emailIn };
+            localStorage.setItem('user_profile', JSON.stringify(currentUser));
+            updateAuthUI();
+            closeAuthModal();
+        };
+        
+        window.handleSignup = function(e) { 
+            if(e) e.preventDefault();
+            const nameIn = document.getElementById('signup-name').value;
+            const emailIn = document.getElementById('signup-email').value;
+            currentUser = { name: nameIn, email: emailIn };
+            localStorage.setItem('user_profile', JSON.stringify(currentUser));
+            updateAuthUI();
+            closeAuthModal();
+        };
+
+        window.logout = function() {
+            currentUser = null;
+            localStorage.removeItem('user_profile');
+            updateAuthUI();
+            document.getElementById('profile-dropdown').classList.add('hidden');
+        };
+
+        window.triggerClearChat = function() {
+            showConfirmModal(
+                currentLang === 'en' ? 'Clear History?' : 'ล้างประวัติแชท?',
+                currentLang === 'en' ? 'Delete all messages?' : 'ต้องการลบข้อความทั้งหมดใช่ไหม?',
+                () => {
+                    localStorage.removeItem('chat_history');
+                    chatHistory = [];
+                    window.location.reload();
+                }
+            );
+        };
+        
+        window.triggerDeleteAccount = function() {
+            showConfirmModal(
+                currentLang === 'en' ? 'Delete Account?' : 'ลบบัญชี?',
+                currentLang === 'en' ? 'This cannot be undone.' : 'การกระทำนี้ไม่สามารถย้อนกลับได้',
+                () => {
+                    localStorage.clear();
+                    window.location.reload();
+                }
+            );
+        };
+
+        window.fillPrompt = function(text) {
+            const input = document.getElementById('user-input');
+            input.value = text;
+            input.dispatchEvent(new Event('input'));
+            input.focus();
+        };
+        
+        window.clearImage = function() {
+            selectedFile = null;
+            document.getElementById('file-input').value = '';
+            document.getElementById('image-preview').src = '';
+            document.getElementById('image-preview-container').classList.add('hidden');
+        };
+        
+        window.handleFileSelect = function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                selectedFile = file;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    document.getElementById('image-preview').src = ev.target.result;
+                    document.getElementById('image-preview-container').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
             }
         };
 
-        // Load language preference
-        let currentLang = localStorage.getItem('app_language') || 'en';
+        window.handleEnter = function(e) {
+            if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('chat-form').dispatchEvent(new Event('submit')); }
+        };
 
-        function updateContent() {
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[currentLang][key]) {
-                    el.innerText = translations[currentLang][key];
-                }
-            });
-
-            const userInput = document.getElementById('user-input');
-            if(userInput && translations[currentLang]) userInput.placeholder = translations[currentLang].placeholder_input;
-
-            const langLabel = document.getElementById('lang-label');
-            if(langLabel) langLabel.innerText = currentLang === 'en' ? 'TH' : 'EN';
-        }
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'en' ? 'th' : 'en';
-            localStorage.setItem('app_language', currentLang);
-            updateContent();
-        }
-
-        // --- Avatar Management ---
-        let botAvatarUrl = localStorage.getItem('bot_avatar');
-
-        function loadAvatar() {
-            if (botAvatarUrl) {
-                const headerAvatar = document.getElementById('header-avatar');
-                if (headerAvatar) {
-                    headerAvatar.innerHTML = `<img src="${botAvatarUrl}" class="w-full h-full object-cover">`;
-                }
-                document.querySelectorAll('.bot-avatar').forEach(el => {
-                    el.innerHTML = `<img src="${botAvatarUrl}" class="w-full h-full object-cover">`;
-                });
-            }
-        }
-
-        function handleAvatarUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
+        window.handleAvatarUpload = function(e) {
+            const file = e.target.files[0];
+            if(file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    botAvatarUrl = e.target.result;
-                    try {
-                        localStorage.setItem('bot_avatar', botAvatarUrl);
-                    } catch(e) { console.error("Storage full"); }
-                    loadAvatar(); 
-                }
+                reader.onload = (ev) => {
+                    botAvatarUrl = ev.target.result;
+                    try { localStorage.setItem('bot_avatar', botAvatarUrl); } catch(err){}
+                    loadAvatar();
+                };
                 reader.readAsDataURL(file);
             }
-        }
+        };
 
-        loadAvatar();
+        function updateAuthUI() {
+            const desktopBtn = document.getElementById('auth-buttons-desktop');
+            const mobileBtn = document.getElementById('auth-buttons-mobile');
+            const profileMenu = document.getElementById('user-profile-menu');
+            const mobileActions = document.getElementById('auth-actions-mobile');
 
-        // --- Chat Logic ---
-        // Generate or Retrieve Session ID
-        let sessionId = localStorage.getItem('chat_session_id');
-        if (!sessionId) {
-            sessionId = crypto.randomUUID();
-            localStorage.setItem('chat_session_id', sessionId);
-        }
-
-        const chatForm = document.getElementById('chat-form');
-        const userInput = document.getElementById('user-input');
-        const fileInput = document.getElementById('file-input');
-        const imagePreviewContainer = document.getElementById('image-preview-container');
-        const imagePreview = document.getElementById('image-preview');
-        const sendBtn = document.getElementById('send-btn');
-        const messagesContainer = document.getElementById('messages');
-        const suggestionChips = document.getElementById('suggestion-chips');
-
-        // Webhook URL
-        const WEBHOOK_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://laassx.app.n8n.cloud/webhook/20f1e0a0-71ed-4fa0-a696-373e4c4f84eb/chat');
-
-        let selectedFile = null;
-
-        userInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
-            if(this.value === '') this.style.height = '48px';
-        });
-
-        function handleEnter(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                chatForm.dispatchEvent(new Event('submit'));
+            if(currentUser) {
+                if(desktopBtn) desktopBtn.classList.add('hidden');
+                if(mobileBtn) mobileBtn.classList.add('hidden');
+                if(profileMenu) profileMenu.classList.remove('hidden');
+                if(mobileActions) mobileActions.classList.remove('hidden');
+                
+                document.getElementById('nav-user-name').innerText = currentUser.name;
+                document.getElementById('mobile-user-name').innerText = currentUser.name;
+                document.getElementById('dropdown-email').innerText = currentUser.email;
+            } else {
+                if(desktopBtn) desktopBtn.classList.remove('hidden');
+                if(mobileBtn) mobileBtn.classList.remove('hidden');
+                if(profileMenu) profileMenu.classList.add('hidden');
+                if(mobileActions) mobileActions.classList.add('hidden');
             }
         }
 
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (file) {
-                selectedFile = file;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
-                    imagePreviewContainer.classList.remove('hidden');
-                }
-                reader.readAsDataURL(file);
-            }
+        function showConfirmModal(title, msg, callback) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-message').innerText = msg;
+            confirmAction = callback;
+            document.getElementById('confirm-modal').classList.add('active');
         }
 
-        function clearImage() {
-            selectedFile = null;
-            fileInput.value = '';
-            imagePreview.src = '';
-            imagePreviewContainer.classList.add('hidden');
-        }
+        window.closeConfirmModal = function() { 
+            document.getElementById('confirm-modal').classList.remove('active'); 
+            confirmAction = null; 
+        };
 
-        let chatHistory = [];
-        try {
-            const stored = localStorage.getItem('chat_history');
-            if (stored) {
-                chatHistory = JSON.parse(stored);
-                if (!Array.isArray(chatHistory)) chatHistory = [];
-            }
-        } catch (e) {
-            localStorage.removeItem('chat_history');
-            chatHistory = [];
-        }
-
+        // --- CHAT LOGIC ---
         function loadChatHistory() {
+            try {
+                const stored = localStorage.getItem('chat_history');
+                if (stored) chatHistory = JSON.parse(stored);
+            } catch(e) { localStorage.removeItem('chat_history'); }
+            
+            const container = document.getElementById('messages');
+            
             if (chatHistory.length > 0) {
-                messagesContainer.innerHTML = ''; 
+                container.innerHTML = ''; // Clear default welcome if history exists
                 
-                // If we have history, we might want to hide the default welcome message
-                // but keep structure consistent.
-                // However, user specifically asked for chips BELOW welcome message.
-                // If we reload history, typically we replace everything.
-                // Let's re-render welcome message + chips + history?
-                // Or just history.
-                
-                // Let's stick to appending history for now to be safe, 
-                // but we need to ensure the Chips are hidden if user has chatted?
-                // Actually, if history exists, usually we just show history.
-                // But the user's design shows chips under welcome message.
-                // So let's re-create that structure.
-                
+                // Add Welcome Msg back at top if cleared
                 const welcomeHtml = `
                     <div class="flex gap-3">
                         <div class="bot-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden">ต</div>
@@ -798,447 +812,210 @@
                             <p class="mt-2 text-slate-300 text-sm" data-i18n="welcome_sub">${translations[currentLang].welcome_sub}</p>
                         </div>
                     </div>
-                    <!-- Chips hidden if history exists? Usually yes -->
                 `;
-                
-                messagesContainer.innerHTML = welcomeHtml;
+                container.insertAdjacentHTML('afterbegin', welcomeHtml);
 
-                // If history exists, we probably don't need chips, or maybe we do?
-                // Let's hide chips if there is history to keep it clean, as chips are usually "starters".
-                // But if you want chips to stay, remove the 'hidden' class logic in addMessage.
+                chatHistory.forEach(msg => renderMessage(msg.content, msg.isUser, msg.imageUrl));
                 
-                chatHistory.forEach(msg => {
-                    renderMessage(msg.content, msg.isUser, msg.imageUrl);
+                // Hide chips if history exists
+                const chips = document.getElementById('suggestion-chips');
+                if(chips) chips.classList.add('hidden');
+                
+                setTimeout(() => container.scrollTop = container.scrollHeight, 100);
+            }
+        }
+
+        function loadAvatar() {
+            if(botAvatarUrl) {
+                document.querySelectorAll('.bot-avatar').forEach(el => {
+                    el.innerHTML = `<img src="${botAvatarUrl}" class="w-full h-full object-cover">`;
                 });
+                document.getElementById('header-avatar').innerHTML = `<img src="${botAvatarUrl}" class="w-full h-full object-cover">`;
+            }
+        }
+
+        function addCopyButtons(container) {
+            const pres = container.querySelectorAll('pre');
+            pres.forEach(pre => {
+                if (pre.querySelector('.copy-btn')) return;
+                pre.style.position = 'relative';
+                pre.classList.add('group');
                 
-                setTimeout(() => {
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                }, 100);
-            }
-        }
-
-        function addMessage(content, isUser = false, imageUrl = null) {
-            chatHistory.push({ content, isUser, imageUrl });
-            try {
-                localStorage.setItem('chat_history', JSON.stringify(chatHistory));
-            } catch(e) {
-                console.warn("History storage failed (likely full)");
-            }
-            
-            if (isUser && suggestionChips) {
-                suggestionChips.classList.add('hidden');
-            }
-
-            renderMessage(content, isUser, imageUrl);
-        }
-
-        function addLoading() {
-            const id = 'loading-' + Date.now();
-            const wrapperDiv = document.createElement('div');
-            wrapperDiv.id = id;
-            wrapperDiv.className = 'flex gap-3';
-            
-            let avatarContent = 'ต';
-            if (botAvatarUrl) {
-                avatarContent = `<img src="${botAvatarUrl}" class="w-full h-full object-cover">`;
-            }
-
-            const thinkingText = currentLang === 'en' ? 'Thinking...' : 'กำลังคิด...';
-            
-            wrapperDiv.innerHTML = `
-                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden bot-avatar">${avatarContent}</div>
-                <div class="bg-slate-800 p-4 rounded-2xl rounded-tl-none border border-slate-700 flex gap-3 items-center h-auto shadow-[0_0_15px_rgba(236,72,153,0.1)]">
-                    <div class="flex gap-1.5">
-                        <div class="typing-dot w-2.5 h-2.5 bg-gradient-to-r from-pink-500 to-pink-600 rounded-full shadow-sm"></div>
-                        <div class="typing-dot w-2.5 h-2.5 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full shadow-sm"></div>
-                        <div class="typing-dot w-2.5 h-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full shadow-sm"></div>
-                    </div>
-                    <span class="text-xs text-slate-400 animate-pulse font-medium">${thinkingText}</span>
-                </div>
-            `;
-            messagesContainer.appendChild(wrapperDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            return id;
-        }
-
-        function removeLoading(id) {
-            const element = document.getElementById(id);
-            if (element) element.remove();
-        }
-
-        chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const text = userInput.value.trim();
-            if (!text && !selectedFile) return;
-
-            const currentText = text;
-            const currentFile = selectedFile;
-            
-            let previewUrl = null;
-            if (currentFile) {
-                if(imagePreview && imagePreview.src && imagePreview.src.startsWith('data:')) {
-                    previewUrl = imagePreview.src;
-                } else {
-                    previewUrl = URL.createObjectURL(currentFile);
-                }
-            }
-            addMessage(currentText, true, previewUrl);
-
-            userInput.value = '';
-            userInput.style.height = '48px';
-            clearImage();
-            
-            const originalBtnContent = sendBtn.innerHTML;
-            sendBtn.innerHTML = '<i data-lucide="loader-2" class="w-6 h-6 animate-spin text-white"></i>';
-            sendBtn.disabled = true;
-            lucide.createIcons();
-
-            const statusTextEl = document.getElementById('bot-status-text');
-            const statusIconEl = document.getElementById('status-icon');
-            if (statusTextEl) statusTextEl.innerText = currentLang === 'en' ? 'Processing...' : 'กำลังประมวลผล...';
-            if (statusIconEl) {
-                statusIconEl.classList.remove('text-yellow-400');
-                statusIconEl.classList.add('text-pink-500', 'animate-ping');
-            }
-
-            const loadingId = addLoading();
-
-            try {
-                const formData = new FormData();
-                formData.append('chatInput', currentText); 
-                formData.append('sessionId', sessionId); 
-                if (currentFile) {
-                    formData.append('file', currentFile); 
-                }
-
-                // Call Webhook
-                const response = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    body: formData
+                const button = document.createElement('button');
+                button.className = 'copy-btn absolute top-2 right-2 text-slate-400 hover:text-white bg-slate-700/50 hover:bg-slate-600 rounded p-1.5 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100';
+                button.innerHTML = '<i data-lucide="copy" class="w-4 h-4"></i>';
+                button.title = 'Copy code';
+                
+                button.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const code = pre.querySelector('code');
+                    const text = code ? code.innerText : pre.innerText;
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        button.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-green-400"></i>';
+                        setTimeout(() => { 
+                            button.innerHTML = '<i data-lucide="copy" class="w-4 h-4"></i>'; 
+                            if(typeof lucide !== 'undefined') lucide.createIcons();
+                        }, 2000);
+                    } catch (err) { console.error('Copy failed', err); }
+                    if(typeof lucide !== 'undefined') lucide.createIcons();
                 });
-
-                if (!response.ok) throw new Error('Network response was not ok');
-
-                const data = await response.json();
-                
-                let botResponse = "Received a response, but it was empty.";
-                
-                if (Array.isArray(data)) {
-                     if(data.length > 0) {
-                         botResponse = data[0].output || data[0].text || data[0].message || data[0].response || JSON.stringify(data[0]);
-                     }
-                } else if (typeof data === 'object') {
-                    botResponse = data.output || data.text || data.message || data.response || JSON.stringify(data);
-                } else {
-                    botResponse = String(data);
-                }
-
-                addMessage(botResponse);
-
-            } catch (error) {
-                console.error('Error:', error);
-                
-                setTimeout(() => {
-                    const fallbackMsg = currentLang === 'en' 
-                        ? "Server is busy/down, but I received: " + currentText 
-                        : "ขออภัยครับ ระบบ n8n มีปัญหาชั่วคราว แต่ผมได้รับข้อความแล้ว: " + currentText;
-                    
-                    addMessage("🤖 [Simulation] " + fallbackMsg);
-                }, 1000);
-
-            } finally {
-                removeLoading(loadingId);
-                
-                sendBtn.innerHTML = originalBtnContent;
-                sendBtn.disabled = false;
-                lucide.createIcons(); 
-
-                updateContent(); 
-                if (statusIconEl) {
-                    statusIconEl.classList.remove('text-pink-500', 'animate-ping');
-                    statusIconEl.classList.add('text-yellow-400');
-                }
-            }
-        });
-
-        // --- Auth System ---
-        let currentUser = null;
-        try {
-            currentUser = JSON.parse(localStorage.getItem('user_profile'));
-        } catch(e) {
-            console.error("User profile corrupt", e);
-        }
-
-        function openAuthModal() {
-            document.getElementById('auth-modal').classList.add('active');
-            toggleAuthMode('login'); // Default to login
-        }
-
-        function closeAuthModal() {
-            document.getElementById('auth-modal').classList.remove('active');
-        }
-
-        function toggleAuthMode(mode) {
-            const loginForm = document.getElementById('login-form');
-            const signupForm = document.getElementById('signup-form');
-            
-            if (mode === 'signup') {
-                loginForm.classList.add('hidden');
-                signupForm.classList.remove('hidden');
-            } else {
-                signupForm.classList.add('hidden');
-                loginForm.classList.remove('hidden');
-            }
-        }
-
-        // Mock Google Login Function
-        function handleGoogleLogin() {
-            const btn = document.querySelector('#login-form button');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="animate-pulse">Connecting...</span>';
-            
-            setTimeout(() => {
-                currentUser = { 
-                    name: "User", 
-                    email: "user@example.com",
-                    isGoogle: true
-                };
-                localStorage.setItem('user_profile', JSON.stringify(currentUser));
-                
-                updateAuthUI();
-                closeAuthModal();
-                btn.innerHTML = originalText;
-                
-                const welcomeMsg = currentLang === 'en' ? `Welcome, ${currentUser.name}!` : `ยินดีต้อนรับคุณ ${currentUser.name}!`;
-                addMessage(welcomeMsg);
-            }, 1000);
-        }
-
-        function handleSignup(e) {
-            e.preventDefault();
-            const name = document.getElementById('signup-name').value;
-            const email = document.getElementById('signup-email').value;
-            
-            currentUser = { name, email };
-            localStorage.setItem('user_profile', JSON.stringify(currentUser));
-            
-            updateAuthUI();
-            closeAuthModal();
-        }
-
-        function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            if (!currentUser) {
-                const namePart = email.split('@')[0];
-                const name = namePart.charAt(0).toUpperCase() + namePart.slice(1);
-                currentUser = { name, email };
-                localStorage.setItem('user_profile', JSON.stringify(currentUser));
-            }
-            updateAuthUI();
-            closeAuthModal();
-        }
-
-        function logout() {
-            currentUser = null;
-            localStorage.removeItem('user_profile');
-            updateAuthUI();
-            const dropdown = document.getElementById('profile-dropdown');
-            if(dropdown) dropdown.classList.add('hidden');
-            const logoutMsg = currentLang === 'en' ? "You have been logged out." : "คุณออกจากระบบเรียบร้อยแล้ว";
-            addMessage(logoutMsg);
-        }
-
-        function updateAuthUI() {
-            const authBtnDesktop = document.getElementById('auth-buttons-desktop');
-            const userProfileMenu = document.getElementById('user-profile-menu');
-            const authBtnMobile = document.getElementById('auth-buttons-mobile');
-            const authActionsMobile = document.getElementById('auth-actions-mobile');
-            
-            if (currentUser) {
-                // LOGGED IN STATE
-                if(authBtnDesktop) {
-                    authBtnDesktop.classList.remove('md:block'); 
-                    authBtnDesktop.classList.add('hidden');
-                }
-                if(userProfileMenu) userProfileMenu.classList.remove('hidden');
-                
-                document.getElementById('nav-user-name').innerText = currentUser.name;
-                
-                const avatarEl = document.getElementById('nav-user-avatar');
-                if (avatarEl) {
-                    if (currentUser.isGoogle) {
-                        avatarEl.style.background = 'linear-gradient(to right, #ec4899, #8b5cf6)'; 
-                        avatarEl.classList.remove('bg-gradient-to-tr', 'from-pink-500', 'to-violet-500');
-                    } else {
-                        avatarEl.style.background = '';
-                        avatarEl.classList.add('bg-gradient-to-tr', 'from-pink-500', 'to-violet-500');
-                    }
-                    avatarEl.innerText = currentUser.name.charAt(0).toUpperCase();
-                }
-                
-                document.getElementById('dropdown-email').innerText = currentUser.email;
-                
-                if(authBtnMobile) authBtnMobile.classList.add('hidden');
-                if(authActionsMobile) {
-                    authActionsMobile.classList.remove('hidden');
-                    document.getElementById('mobile-user-name').innerText = currentUser.name;
-                }
-            } else {
-                // LOGGED OUT STATE
-                if(authBtnDesktop) {
-                    authBtnDesktop.classList.remove('hidden');
-                    authBtnDesktop.classList.add('md:block');
-                }
-                if(userProfileMenu) userProfileMenu.classList.add('hidden');
-                
-                if(authBtnMobile) authBtnMobile.classList.remove('hidden');
-                if(authActionsMobile) authActionsMobile.classList.add('hidden');
-            }
-        }
-
-        function toggleProfileMenu() {
-            const dropdown = document.getElementById('profile-dropdown');
-            dropdown.classList.toggle('hidden');
-        }
-
-        updateAuthUI();
-
-        // --- Custom Confirm Modal Logic ---
-        let confirmAction = null;
-
-        function showConfirmModal(title, message, action) {
-            document.getElementById('confirm-title').innerText = title;
-            document.getElementById('confirm-message').innerText = message;
-            confirmAction = action;
-            document.getElementById('confirm-modal').classList.add('active');
-        }
-
-        function closeConfirmModal() {
-            document.getElementById('confirm-modal').classList.remove('active');
-            confirmAction = null;
-        }
-
-        const confirmYesBtn = document.getElementById('confirm-yes-btn');
-        if(confirmYesBtn) {
-            confirmYesBtn.addEventListener('click', function() {
-                if (confirmAction) confirmAction();
-                closeConfirmModal();
-            });
-        }
-
-        function triggerClearChat() {
-            const title = currentLang === 'en' ? 'Clear Chat History?' : 'ล้างประวัติแชท?';
-            const msg = currentLang === 'en' ? 'This will remove all messages from this device.' : 'ข้อความทั้งหมดในเครื่องนี้จะถูกลบ';
-            
-            showConfirmModal(title, msg, () => {
-                localStorage.removeItem('chat_history');
-                chatHistory = [];
-                window.location.reload();
-            });
-        }
-
-        function triggerDeleteAccount() {
-            const title = currentLang === 'en' ? 'Delete Account?' : 'ลบบัญชีผู้ใช้?';
-            const msg = currentLang === 'en' ? 'This will permanently delete your profile and all data.' : 'ข้อมูลโปรไฟล์และประวัติทั้งหมดจะถูกลบถาวร';
-            
-            showConfirmModal(title, msg, () => {
-                localStorage.clear();
-                currentUser = null;
-                updateAuthUI();
-                toggleProfileMenu();
-                addMessage(currentLang === 'en' ? "Account deleted." : "ลบบัญชีเรียบร้อยแล้ว");
-                setTimeout(() => window.location.reload(), 1000);
+                pre.appendChild(button);
             });
         }
 
         function renderMessage(content, isUser, imageUrl) {
-             const wrapperDiv = document.createElement('div');
-            wrapperDiv.className = `flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`;
-
-            const avatarDiv = document.createElement('div');
-            avatarDiv.className = `w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden ${isUser ? 'bg-slate-700 text-slate-300' : 'bg-gradient-to-tr from-pink-500 to-violet-600 bot-avatar'}`;
+            const container = document.getElementById('messages');
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`;
             
-            // Handle User vs Bot Avatar Content
-            if (isUser) {
-                if (currentUser) {
-                    avatarDiv.innerText = currentUser.name.charAt(0).toUpperCase();
-                } else {
-                    avatarDiv.textContent = currentLang === 'en' ? 'You' : 'คุณ';
-                }
+            const avatar = document.createElement('div');
+            avatar.className = `w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden ${isUser ? 'bg-slate-700 text-slate-300' : 'bg-gradient-to-tr from-pink-500 to-violet-600 bot-avatar'}`;
+            if(isUser) {
+                avatar.innerText = currentUser ? currentUser.name.charAt(0).toUpperCase() : (currentLang==='en'?'You':'คุณ');
             } else {
-                if (botAvatarUrl) {
-                    avatarDiv.innerHTML = `<img src="${botAvatarUrl}" class="w-full h-full object-cover">`;
-                } else {
-                    avatarDiv.innerText = 'ต';
-                }
+                if(botAvatarUrl) avatar.innerHTML = `<img src="${botAvatarUrl}" class="w-full h-full object-cover">`;
+                else avatar.innerText = 'ต';
             }
 
-            const messageBubble = document.createElement('div');
-            messageBubble.className = `p-4 rounded-2xl max-w-[85%] shadow-md border ${
-                isUser 
-                ? 'bg-indigo-600 text-white border-indigo-500 rounded-tr-none' 
-                : 'bg-slate-800 text-slate-200 border-slate-700 rounded-tl-none prose'
-            }`;
+            const bubble = document.createElement('div');
+            bubble.className = `p-4 rounded-2xl max-w-[85%] shadow-md border ${isUser ? 'bg-indigo-600 text-white border-indigo-500 rounded-tr-none' : 'bg-slate-800 text-slate-200 border-slate-700 rounded-tl-none prose'}`;
 
-            if (imageUrl) {
+            if(imageUrl) {
                 const img = document.createElement('img');
                 img.src = imageUrl;
                 img.className = "rounded-lg mb-2 max-h-48 border border-white/10";
                 img.onerror = function() { this.style.display = 'none'; };
-                messageBubble.appendChild(img);
+                bubble.appendChild(img);
             }
 
-            if (content) {
+            if(content) {
                 const textDiv = document.createElement('div');
-                if (typeof marked !== 'undefined') {
-                    try {
-                        textDiv.innerHTML = marked.parse(content);
-                    } catch(e) {
-                        textDiv.innerHTML = content.replace(/\n/g, '<br>');
-                    }
+                if(typeof marked !== 'undefined') {
+                    try { 
+                        textDiv.innerHTML = marked.parse(content); 
+                        setTimeout(() => {
+                            addCopyButtons(textDiv);
+                            if(typeof lucide !== 'undefined') lucide.createIcons();
+                        }, 0);
+                    } 
+                    catch(e) { textDiv.innerText = content; }
                 } else {
-                    textDiv.innerHTML = content.replace(/\n/g, '<br>');
+                    textDiv.innerText = content;
                 }
-                messageBubble.appendChild(textDiv);
+                bubble.appendChild(textDiv);
             }
 
-            wrapperDiv.appendChild(avatarDiv);
-            wrapperDiv.appendChild(messageBubble);
-            messagesContainer.appendChild(wrapperDiv);
+            wrapper.appendChild(avatar);
+            wrapper.appendChild(bubble);
+            container.appendChild(wrapper);
+            container.scrollTop = container.scrollHeight;
         }
 
-        // --- Suggestion Chips Logic ---
-        function fillPrompt(text) {
-            const input = document.getElementById('user-input');
-            input.value = text;
-            input.style.height = 'auto';
-            input.style.height = (input.scrollHeight) + 'px';
-            input.focus();
-        }
-
-        // --- View Navigation Logic ---
-        function navigateTo(viewId) {
-            document.querySelectorAll('.view-section').forEach(el => {
-                el.classList.remove('active');
-                setTimeout(() => {
-                    if(!el.classList.contains('active')) el.style.display = 'none';
-                }, 300); 
-            });
-
-            const selectedView = document.getElementById('view-' + viewId);
-            selectedView.style.display = 'flex';
-            setTimeout(() => {
-                selectedView.classList.add('active');
-            }, 10);
-
-            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('nav-btn-active'));
-            const activeBtn = document.getElementById('nav-' + viewId);
-            if(activeBtn) activeBtn.classList.add('nav-btn-active');
+        function addMessage(content, isUser = false, imageUrl = null) {
+            chatHistory.push({content, isUser, imageUrl});
+            try { localStorage.setItem('chat_history', JSON.stringify(chatHistory)); } catch(e){}
             
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if(isUser) {
+                const chips = document.getElementById('suggestion-chips');
+                if(chips) chips.classList.add('hidden');
+            }
+            renderMessage(content, isUser, imageUrl);
         }
+
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            const loader = document.getElementById('page-loader');
+            if(loader) {
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 300);
+                }, 300);
+            }
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+            
+            updateContent();
+            updateAuthUI();
+            loadAvatar();
+            loadChatHistory();
+            navigateTo('home');
+
+            const userInput = document.getElementById('user-input');
+            if(userInput) {
+                userInput.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+            }
+
+            const confirmYesBtn = document.getElementById('confirm-yes-btn');
+            if(confirmYesBtn) {
+                confirmYesBtn.onclick = () => {
+                    if(confirmAction) confirmAction();
+                    closeConfirmModal();
+                };
+            }
+
+            document.getElementById('chat-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const input = document.getElementById('user-input');
+                const text = input.value.trim();
+                if(!text && !selectedFile) return;
+
+                let previewUrl = null;
+                if(selectedFile) {
+                    const prevImg = document.getElementById('image-preview');
+                    if(prevImg.src && prevImg.src.startsWith('data:')) previewUrl = prevImg.src;
+                }
+                
+                addMessage(text, true, previewUrl);
+                
+                input.value = '';
+                input.style.height = '48px';
+                clearImage();
+                
+                const sendBtn = document.getElementById('send-btn');
+                const originalBtnContent = sendBtn.innerHTML;
+                sendBtn.innerHTML = '<div class="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>';
+                sendBtn.disabled = true;
+
+                const loadingId = 'loading-' + Date.now();
+                const loadingHtml = `<div id="${loadingId}" class="flex gap-3"><div class="bot-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white">ต</div><div class="bg-slate-800 p-4 rounded-2xl rounded-tl-none border border-slate-700 flex gap-2 items-center"><div class="typing-dot w-2 h-2 bg-pink-500 rounded-full"></div><div class="typing-dot w-2 h-2 bg-purple-500 rounded-full"></div><div class="typing-dot w-2 h-2 bg-indigo-500 rounded-full"></div></div></div>`;
+                document.getElementById('messages').insertAdjacentHTML('beforeend', loadingHtml);
+                document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+
+                try {
+                    const formData = new FormData();
+                    formData.append('chatInput', text);
+                    formData.append('sessionId', sessionId);
+                    if(selectedFile) formData.append('file', selectedFile);
+
+                    const WEBHOOK_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://laassx.app.n8n.cloud/webhook/20f1e0a0-71ed-4fa0-a696-373e4c4f84eb/chat');
+                    
+                    const response = await fetch(WEBHOOK_URL, { method: 'POST', body: formData });
+                    if(!response.ok) throw new Error('Network error');
+                    
+                    const data = await response.json();
+                    let botResp = "Received empty response";
+                    if(Array.isArray(data) && data.length > 0) botResp = data[0].output || data[0].text || JSON.stringify(data[0]);
+                    else if(typeof data === 'object') botResp = data.output || data.text || JSON.stringify(data);
+                    else botResp = String(data);
+
+                    addMessage(botResp);
+                } catch(err) {
+                    console.warn(err);
+                    setTimeout(() => {
+                        addMessage("🤖 [Simulation Mode] Server unavailable. Received: " + text);
+                    }, 1000);
+                } finally {
+                    const loader = document.getElementById(loadingId);
+                    if(loader) loader.remove();
+                    sendBtn.innerHTML = originalBtnContent;
+                    sendBtn.disabled = false;
+                    if(typeof lucide !== 'undefined') lucide.createIcons();
+                }
+            });
+        });
     </script>
 </body>
 </html>
