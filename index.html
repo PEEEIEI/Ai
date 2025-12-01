@@ -5,12 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้ | AI Friend & Creator</title>
     
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600;700&family=Nunito:wght@400;600;700&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     
@@ -68,6 +72,7 @@
         .chat-container {
             scrollbar-width: thin;
             scrollbar-color: #475569 #1e293b;
+            scroll-behavior: smooth;
         }
         .chat-container::-webkit-scrollbar {
             width: 8px;
@@ -161,8 +166,11 @@
         #mobile-menu {
             z-index: 50;
         }
+        .hidden-menu {
+            display: none;
+        }
     </style>
-</head>
+</head> 
 <body class="min-h-screen flex flex-col relative overflow-x-hidden">
 
     <div id="page-loader">
@@ -184,7 +192,7 @@
                 
                 <button onclick="handleGoogleLogin()" class="w-full py-3 bg-white text-slate-700 rounded-xl font-bold shadow-lg hover:bg-slate-100 transition transform hover:scale-[1.02] flex items-center justify-center gap-3 mb-4">
                     <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M23.766 12.2764C23.766 11.4607 23.6999 10.6406 23.5588 9.83807H12.24V14.4591H18.7217C18.4528 15.9494 17.5885 17.2678 16.323 18.1056V21.1039H20.19C22.4608 19.0139 23.766 15.9274 23.766 12.2764Z" fill="#4285F4"/><path d="M12.2401 24.0008C15.4766 24.0008 18.2059 22.9382 20.1945 21.1039L16.3275 18.1055C15.2517 18.8375 13.8627 19.252 12.2445 19.252C9.11388 19.252 6.45946 17.1399 5.50705 14.3003H1.5166V17.3912C3.55371 21.4434 7.7029 24.0008 12.2401 24.0008Z" fill="#34A853"/><path d="M5.50253 14.3003C5.00236 12.8099 5.00236 11.1961 5.50253 9.70575V6.61481H1.51649C-0.18551 10.0056 -0.18551 14.0004 1.51649 17.3912L5.50253 14.3003Z" fill="#FBBC05"/><path d="M12.2401 4.74966C13.9509 4.7232 15.6044 5.36697 16.8434 6.54867L20.2695 3.12262C18.1001 1.0855 15.2208 -0.034466 12.2401 0.000808666C7.7029 0.000808666 3.55371 2.55822 1.5166 6.61481L5.50264 9.70575C6.45064 6.86173 9.10947 4.74966 12.2401 4.74966Z" fill="#EA4335"/></svg>
-                    <span>Google (Demo)</span>
+                    <span>Google (Demo Mode)</span>
                 </button>
 
                 <div class="relative flex py-2 items-center">
@@ -285,7 +293,7 @@
 
                 <div id="user-profile-menu" class="hidden relative">
                     <button onclick="toggleProfileMenu()" class="flex items-center gap-2 bg-slate-800/80 hover:bg-slate-700 pr-4 pl-1 py-1 rounded-full border border-slate-600 transition">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm" id="nav-user-avatar">U</div>
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm overflow-hidden" id="nav-user-avatar">U</div>
                         <span class="text-sm font-bold text-white max-w-[100px] truncate" id="nav-user-name">User</span>
                     </button>
                     <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden z-50">
@@ -311,7 +319,7 @@
             </div>
         </div>
 
-        <div id="mobile-menu" class="hidden-menu hidden w-full mt-4 bg-slate-800/90 backdrop-blur-xl border border-slate-700/50 rounded-2xl overflow-hidden shadow-2xl">
+        <div id="mobile-menu" class="hidden-menu w-full mt-4 bg-slate-800/90 backdrop-blur-xl border border-slate-700/50 rounded-2xl overflow-hidden shadow-2xl">
             <div class="flex flex-col p-2 space-y-1">
                 <button onclick="navigateTo('home'); toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl hover:bg-white/10 text-slate-200 font-medium transition flex items-center gap-3">
                     <i data-lucide="home" class="w-5 h-5 text-pink-400"></i> <span data-i18n="home">Home</span>
@@ -356,47 +364,47 @@
     <main class="flex-grow container mx-auto px-4 py-4 md:py-8 z-10 w-full">
         
         <div id="view-home" class="view-section flex-col items-center gap-8 md:gap-16 active">
-        <section id="home" class="text-center max-w-3xl space-y-6 mt-4 md:mt-10">
-            <div class="inline-block px-4 py-1 rounded-full bg-slate-800 border border-slate-700 text-sm text-pink-400 mb-4 animate-bounce shadow-[0_0_15px_rgba(236,72,153,0.3)]" data-i18n="meet_companion">
-                ✨ Meet your new AI Companion
-            </div>
-            <h1 class="text-4xl md:text-6xl font-bold leading-[1.6] md:leading-[1.6] py-4">
-                <span class="drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]" data-i18n="hero_title_prefix">Hey, I'm</span> 
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 inline-block text-glow-anim" data-i18n="brand_name">ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้</span>
-            </h1>
-            <p class="text-xl text-slate-400 drop-shadow-md" data-i18n="hero_desc">
-                A digital creator and your personal AI friend. Let's talk about ideas, code, or just vibe. Drop an image, ask a question, and let's create something cool.
-            </p>
-            
-            <button onclick="navigateTo('chat')" class="mt-8 px-8 py-4 bg-gradient-to-r from-pink-600 to-violet-600 text-white rounded-full font-bold text-lg shadow-[0_0_30px_rgba(236,72,153,0.4)] hover:scale-105 hover:shadow-[0_0_50px_rgba(236,72,153,0.7)] transition-all duration-300" data-i18n="start_chatting_btn">
-                Start Chatting Now 🚀
-            </button>
-        </section>
-
-        <section class="w-full max-w-5xl mt-8 md:mt-12 pb-0">
-                <h2 class="text-2xl font-bold text-center mb-8 text-white border-b border-slate-700 pb-4 inline-block mx-auto" data-i18n="how_to_use">How to use / Features</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-pink-500/50 transition duration-300">
-                        <div class="w-12 h-12 bg-pink-500/20 rounded-xl flex items-center justify-center mb-4 text-pink-400">
-                            <i data-lucide="message-circle" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2 text-white" data-i18n="feat_chat_title">Smart Chat</h3>
-                        <p class="text-slate-400 text-sm" data-i18n="feat_chat_desc">
-                            Ask me anything! From coding help to creative writing, or just a friendly conversation. I'm here to assist.
-                        </p>
-                    </div>
-
-                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-violet-500/50 transition duration-300">
-                        <div class="w-12 h-12 bg-violet-500/20 rounded-xl flex items-center justify-center mb-4 text-violet-400">
-                            <i data-lucide="image" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2 text-white" data-i18n="feat_image_title">Image Analysis</h3>
-                        <p class="text-slate-400 text-sm" data-i18n="feat_image_desc">
-                            Upload an image in the chat, and I can describe it, extract text, or answer questions about it.
-                        </p>
-                    </div>
+            <section id="home" class="text-center max-w-3xl space-y-6 mt-4 md:mt-10">
+                <div class="inline-block px-4 py-1 rounded-full bg-slate-800 border border-slate-700 text-sm text-pink-400 mb-4 animate-bounce shadow-[0_0_15px_rgba(236,72,153,0.3)]" data-i18n="meet_companion">
+                    ✨ Meet your new AI Companion
                 </div>
+                <h1 class="text-4xl md:text-6xl font-bold leading-[1.6] md:leading-[1.6] py-4">
+                    <span class="drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]" data-i18n="hero_title_prefix">Hey, I'm</span> 
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 inline-block text-glow-anim" data-i18n="brand_name">ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้</span>
+                </h1>
+                <p class="text-xl text-slate-400 drop-shadow-md" data-i18n="hero_desc">
+                    A digital creator and your personal AI friend. Let's talk about ideas, code, or just vibe. Drop an image, ask a question, and let's create something cool.
+                </p>
+                
+                <button onclick="navigateTo('chat')" class="mt-8 px-8 py-4 bg-gradient-to-r from-pink-600 to-violet-600 text-white rounded-full font-bold text-lg shadow-[0_0_30px_rgba(236,72,153,0.4)] hover:scale-105 hover:shadow-[0_0_50px_rgba(236,72,153,0.7)] transition-all duration-300" data-i18n="start_chatting_btn">
+                    Start Chatting Now 🚀
+                </button>
+            </section>
+
+            <section class="w-full max-w-5xl mt-8 md:mt-12 pb-0">
+                    <h2 class="text-2xl font-bold text-center mb-8 text-white border-b border-slate-700 pb-4 inline-block mx-auto" data-i18n="how_to_use">How to use / Features</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-pink-500/50 transition duration-300">
+                            <div class="w-12 h-12 bg-pink-500/20 rounded-xl flex items-center justify-center mb-4 text-pink-400">
+                                <i data-lucide="message-circle" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2 text-white" data-i18n="feat_chat_title">Smart Chat</h3>
+                            <p class="text-slate-400 text-sm" data-i18n="feat_chat_desc">
+                                Ask me anything! From coding help to creative writing, or just a friendly conversation. I'm here to assist.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-violet-500/50 transition duration-300">
+                            <div class="w-12 h-12 bg-violet-500/20 rounded-xl flex items-center justify-center mb-4 text-violet-400">
+                                <i data-lucide="image" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2 text-white" data-i18n="feat_image_title">Image Analysis</h3>
+                            <p class="text-slate-400 text-sm" data-i18n="feat_image_desc">
+                                Upload an image in the chat, and I can describe it, extract text, or answer questions about it.
+                            </p>
+                        </div>
+                    </div>
             </section>
 
             <section class="w-full max-w-5xl mt-12 mb-20 border-t border-slate-800 pt-12">
@@ -404,7 +412,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50 flex flex-col items-center text-center hover:bg-slate-800/50 transition duration-300">
                         <div class="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mb-4 text-blue-400 font-bold text-xl">
-                             <i data-lucide="code" class="w-6 h-6"></i>
+                            <i data-lucide="code" class="w-6 h-6"></i>
                         </div>
                         <h3 class="text-lg font-bold mb-2 text-white" data-i18n="step_1">Web Developer Expert</h3>
                         <p class="text-slate-400 text-sm" data-i18n="step_1_desc">Generate beautiful portfolios and modern websites with HTML/CSS code.</p>
@@ -525,7 +533,7 @@
     </footer>
 
     <script>
-        // Global variables declared first
+        // --- Global Variables ---
         let currentLang = localStorage.getItem('app_language') || 'th';
         let sessionId = localStorage.getItem('chat_session_id');
         if (!sessionId) {
@@ -543,7 +551,7 @@
             if (userStr) currentUser = JSON.parse(userStr);
         } catch(e) { console.error("User profile corrupt", e); }
 
-        // Translations Data
+        // --- Translations ---
         const translations = {
             en: {
                 home: "Home", about: "About", ai_friend: "AI Friend", chat_now: "Chat Now",
@@ -587,8 +595,7 @@
             }
         };
 
-        // --- Global Functions (Attached to window for HTML onclick) ---
-        
+        // --- UI Helper Functions ---
         window.updateContent = function() {
             const t = translations[currentLang];
             document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -625,13 +632,12 @@
         window.toggleMobileMenu = function() {
             const menu = document.getElementById('mobile-menu');
             const icon = document.getElementById('mobile-menu-icon');
+            
             if (menu.classList.contains('hidden-menu')) {
                 menu.classList.remove('hidden-menu');
-                menu.classList.remove('hidden');
                 icon.setAttribute('data-lucide', 'x');
             } else {
                 menu.classList.add('hidden-menu');
-                menu.classList.add('hidden');
                 icon.setAttribute('data-lucide', 'menu');
             }
             if(typeof lucide !== 'undefined') lucide.createIcons();
@@ -654,6 +660,7 @@
             else { signup.classList.add('hidden'); login.classList.remove('hidden'); }
         };
 
+        // --- AUTH Logic (Mock & Manual) ---
         window.handleLogin = function(e) {
             if(e) e.preventDefault();
             const emailIn = document.getElementById('login-email').value;
@@ -663,22 +670,35 @@
             updateAuthUI();
             closeAuthModal();
         };
-        
-        window.handleGoogleLogin = function() { 
-            const btn = document.querySelector('button[onclick="handleGoogleLogin()"]');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="animate-pulse">Connecting...</span>';
+
+        // Mock Google Login for Demo Purposes
+        window.handleGoogleLogin = function() {
+            const googleBtn = document.querySelector('button[onclick="handleGoogleLogin()"]');
+            const originalContent = googleBtn.innerHTML;
+            googleBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-slate-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Signing in...</span>
+            `;
             
             setTimeout(() => {
-                currentUser = { name: "Google Demo User", email: "demo@gmail.com", isGoogle: true };
+                const mockResponse = {
+                    name: "Demo User",
+                    email: "demo@gmail.com",
+                    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
+                };
+                currentUser = { 
+                    name: mockResponse.name, 
+                    email: mockResponse.email,
+                    avatar: mockResponse.picture 
+                };
                 localStorage.setItem('user_profile', JSON.stringify(currentUser));
                 updateAuthUI();
                 closeAuthModal();
-                btn.innerHTML = originalText;
-                
-                const welcomeMsg = currentLang === 'en' ? `Welcome, ${currentUser.name}!` : `ยินดีต้อนรับคุณ ${currentUser.name}!`;
-                addMessage(welcomeMsg);
-            }, 1000);
+                googleBtn.innerHTML = originalContent;
+            }, 1500);
         };
 
         window.handleSignup = function(e) { 
@@ -698,6 +718,42 @@
             document.getElementById('profile-dropdown').classList.add('hidden');
         };
 
+        function updateAuthUI() {
+            const desktopBtn = document.getElementById('auth-buttons-desktop');
+            const mobileBtn = document.getElementById('auth-buttons-mobile');
+            const profileMenu = document.getElementById('user-profile-menu');
+            const mobileActions = document.getElementById('auth-actions-mobile');
+
+            if(currentUser) {
+                if(desktopBtn) {
+                    desktopBtn.classList.remove('md:block');
+                    desktopBtn.classList.add('hidden');
+                }
+                if(mobileBtn) mobileBtn.classList.add('hidden');
+                
+                if(profileMenu) profileMenu.classList.remove('hidden');
+                if(mobileActions) mobileActions.classList.remove('hidden');
+                
+                document.getElementById('nav-user-name').innerText = currentUser.name;
+                document.getElementById('mobile-user-name').innerText = currentUser.name;
+                document.getElementById('dropdown-email').innerText = currentUser.email;
+                if(currentUser.avatar) {
+                    const avatarHtml = `<img src="${currentUser.avatar}" class="w-full h-full object-cover">`;
+                    document.getElementById('nav-user-avatar').innerHTML = avatarHtml;
+                }
+            } else {
+                if(desktopBtn) {
+                    desktopBtn.classList.remove('hidden');
+                    desktopBtn.classList.add('md:block');
+                }
+                if(mobileBtn) mobileBtn.classList.remove('hidden');
+                
+                if(profileMenu) profileMenu.classList.add('hidden');
+                if(mobileActions) mobileActions.classList.add('hidden');
+            }
+        }
+
+        // --- Modals ---
         window.triggerClearChat = function() {
             showConfirmModal(
                 currentLang === 'en' ? 'Clear History?' : 'ล้างประวัติแชท?',
@@ -721,6 +777,19 @@
             );
         };
 
+        function showConfirmModal(title, msg, callback) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-message').innerText = msg;
+            confirmAction = callback;
+            document.getElementById('confirm-modal').classList.add('active');
+        }
+
+        window.closeConfirmModal = function() { 
+            document.getElementById('confirm-modal').classList.remove('active'); 
+            confirmAction = null; 
+        };
+
+        // --- Chat & File Logic ---
         window.fillPrompt = function(text) {
             const input = document.getElementById('user-input');
             input.value = text;
@@ -765,42 +834,7 @@
             }
         };
 
-        function updateAuthUI() {
-            const desktopBtn = document.getElementById('auth-buttons-desktop');
-            const mobileBtn = document.getElementById('auth-buttons-mobile');
-            const profileMenu = document.getElementById('user-profile-menu');
-            const mobileActions = document.getElementById('auth-actions-mobile');
-
-            if(currentUser) {
-                if(desktopBtn) desktopBtn.classList.add('hidden');
-                if(mobileBtn) mobileBtn.classList.add('hidden');
-                if(profileMenu) profileMenu.classList.remove('hidden');
-                if(mobileActions) mobileActions.classList.remove('hidden');
-                
-                document.getElementById('nav-user-name').innerText = currentUser.name;
-                document.getElementById('mobile-user-name').innerText = currentUser.name;
-                document.getElementById('dropdown-email').innerText = currentUser.email;
-            } else {
-                if(desktopBtn) desktopBtn.classList.remove('hidden');
-                if(mobileBtn) mobileBtn.classList.remove('hidden');
-                if(profileMenu) profileMenu.classList.add('hidden');
-                if(mobileActions) mobileActions.classList.add('hidden');
-            }
-        }
-
-        function showConfirmModal(title, msg, callback) {
-            document.getElementById('confirm-title').innerText = title;
-            document.getElementById('confirm-message').innerText = msg;
-            confirmAction = callback;
-            document.getElementById('confirm-modal').classList.add('active');
-        }
-
-        window.closeConfirmModal = function() { 
-            document.getElementById('confirm-modal').classList.remove('active'); 
-            confirmAction = null; 
-        };
-
-        // --- CHAT LOGIC ---
+        // --- Chat Rendering ---
         function loadChatHistory() {
             try {
                 const stored = localStorage.getItem('chat_history');
@@ -810,9 +844,8 @@
             const container = document.getElementById('messages');
             
             if (chatHistory.length > 0) {
-                container.innerHTML = ''; // Clear default welcome if history exists
-                
-                // Add Welcome Msg back at top if cleared
+                container.innerHTML = ''; 
+                // Restore Welcome Message
                 const welcomeHtml = `
                     <div class="flex gap-3">
                         <div class="bot-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden">ต</div>
@@ -826,7 +859,6 @@
 
                 chatHistory.forEach(msg => renderMessage(msg.content, msg.isUser, msg.imageUrl));
                 
-                // Hide chips if history exists
                 const chips = document.getElementById('suggestion-chips');
                 if(chips) chips.classList.add('hidden');
                 
@@ -878,23 +910,28 @@
             const wrapper = document.createElement('div');
             wrapper.className = `flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`;
             
+            // Avatar
             const avatar = document.createElement('div');
             avatar.className = `w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden ${isUser ? 'bg-slate-700 text-slate-300' : 'bg-gradient-to-tr from-pink-500 to-violet-600 bot-avatar'}`;
             if(isUser) {
-                avatar.innerText = currentUser ? currentUser.name.charAt(0).toUpperCase() : (currentLang==='en'?'You':'คุณ');
+                let initial = (currentLang==='en'?'Y':'ค');
+                if(currentUser && currentUser.name) initial = currentUser.name.charAt(0).toUpperCase();
+                avatar.innerText = initial;
             } else {
                 if(botAvatarUrl) avatar.innerHTML = `<img src="${botAvatarUrl}" class="w-full h-full object-cover">`;
                 else avatar.innerText = 'ต';
             }
 
+            // Bubble
             const bubble = document.createElement('div');
-            bubble.className = `p-4 rounded-2xl max-w-[85%] shadow-md border ${isUser ? 'bg-indigo-600 text-white border-indigo-500 rounded-tr-none' : 'bg-slate-800 text-slate-200 border-slate-700 rounded-tl-none prose'}`;
+            bubble.className = `p-4 rounded-2xl max-w-[90%] md:max-w-[85%] shadow-md border ${isUser ? 'bg-indigo-600 text-white border-indigo-500 rounded-tr-none' : 'bg-slate-800 text-slate-200 border-slate-700 rounded-tl-none prose prose-invert max-w-none'}`;
 
             if(imageUrl) {
                 const img = document.createElement('img');
                 img.src = imageUrl;
-                img.className = "rounded-lg mb-2 max-h-48 border border-white/10";
+                img.className = "rounded-lg mb-2 max-h-48 max-w-full object-contain border border-white/10";
                 img.onerror = function() { this.style.display = 'none'; };
+                img.onload = function() { container.scrollTop = container.scrollHeight; };
                 bubble.appendChild(img);
             }
 
@@ -902,13 +939,46 @@
                 const textDiv = document.createElement('div');
                 if(typeof marked !== 'undefined') {
                     try { 
-                        textDiv.innerHTML = marked.parse(content); 
+                        const rawHtml = marked.parse(content);
+                        const cleanHtml = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(rawHtml) : rawHtml;
+                        textDiv.innerHTML = cleanHtml;
+                        
+                        // Preview Generator Logic (Simplified for stability)
                         setTimeout(() => {
+                            const codeBlocks = textDiv.querySelectorAll('pre code.language-html, pre code.language-xml');
+                            codeBlocks.forEach(block => {
+                                const code = block.innerText;
+                                const preElement = block.parentElement;
+                                const previewContainer = document.createElement('div');
+                                previewContainer.className = "mt-4 mb-2 rounded-xl overflow-hidden border border-slate-600 shadow-lg bg-white";
+                                
+                                const header = document.createElement('div');
+                                header.className = "bg-slate-100 px-4 py-2 border-b border-slate-200 flex justify-between items-center";
+                                header.innerHTML = `<span class="text-xs font-bold text-slate-500 flex items-center gap-1"><i data-lucide="eye" class="w-3 h-3"></i> Live Preview</span><span class="flex gap-1"><div class="w-2 h-2 rounded-full bg-red-400"></div><div class="w-2 h-2 rounded-full bg-yellow-400"></div><div class="w-2 h-2 rounded-full bg-green-400"></div></span>`;
+                                
+                                const iframe = document.createElement('iframe');
+                                iframe.className = "w-full h-[300px] md:h-[400px] bg-white";
+                                iframe.style.border = "none";
+                                
+                                let finalCode = code;
+                                if(!code.includes('<head>') && !code.includes('cdn.tailwindcss')) {
+                                    finalCode = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script src="https://cdn.tailwindcss.com"><\/script></head><body class="p-4 bg-gray-50 flex flex-col justify-center min-h-screen">${code}</body></html>`;
+                                }
+                                iframe.srcdoc = finalCode;
+                                
+                                previewContainer.appendChild(header);
+                                previewContainer.appendChild(iframe);
+                                preElement.parentNode.insertBefore(previewContainer, preElement.nextSibling);
+                                if(typeof lucide !== 'undefined') lucide.createIcons();
+                            });
                             addCopyButtons(textDiv);
                             if(typeof lucide !== 'undefined') lucide.createIcons();
-                        }, 0);
-                    } 
-                    catch(e) { textDiv.innerText = content; }
+                        }, 50);
+
+                    } catch(e) { 
+                        console.error(e);
+                        textDiv.innerText = content; 
+                    }
                 } else {
                     textDiv.innerText = content;
                 }
@@ -932,7 +1002,7 @@
             renderMessage(content, isUser, imageUrl);
         }
 
-        // Initialization
+        // --- Initialization ---
         window.addEventListener('DOMContentLoaded', () => {
             const loader = document.getElementById('page-loader');
             if(loader) {
@@ -970,7 +1040,7 @@
                 const input = document.getElementById('user-input');
                 const text = input.value.trim();
                 
-                // --- CRITICAL FIX: Capture file BEFORE clearing UI ---
+                // Capture file reference BEFORE clearing UI
                 const fileToSend = selectedFile; 
                 
                 if(!text && !fileToSend) return;
@@ -981,13 +1051,11 @@
                     if(prevImg.src && prevImg.src.startsWith('data:')) previewUrl = prevImg.src;
                 }
                 
-                // Show user message in UI immediately
                 addMessage(text, true, previewUrl);
                 
-                // Clear inputs
                 input.value = '';
                 input.style.height = '48px';
-                clearImage(); 
+                clearImage(); // Clear selection after sending
                 input.focus();
                 
                 const sendBtn = document.getElementById('send-btn');
@@ -1005,13 +1073,12 @@
                     formData.append('chatInput', text);
                     formData.append('sessionId', sessionId);
                     
-                    // Append the captured file
                     if(fileToSend) {
                         formData.append('file', fileToSend);
                         console.log("Sending file:", fileToSend.name);
                     }
 
-                    // Using corsproxy.io (Might be unstable, added error handling below)
+                    // CORS Proxy Handler
                     const WEBHOOK_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://laassx.app.n8n.cloud/webhook/20f1e0a0-71ed-4fa0-a696-373e4c4f84eb/chat');
                     
                     const response = await fetch(WEBHOOK_URL, { method: 'POST', body: formData });
@@ -1028,10 +1095,9 @@
                 } catch(err) {
                     console.warn(err);
                     setTimeout(() => {
-                        // Simulation Mode (Failover)
                         const errMsg = currentLang === 'en' 
-                            ? "🤖 [Simulation] Server (n8n) unreachable. I received your message: " + text + (fileToSend ? " [with Image]" : "")
-                            : "🤖 [โหมดจำลอง] เชื่อมต่อเซิร์ฟเวอร์ (n8n) ไม่ได้ แต่ผมได้รับข้อความของคุณแล้ว: " + text + (fileToSend ? " [พร้อมรูปภาพ]" : "");
+                            ? "🤖 [Simulation] Server (n8n) unreachable (CORS/Proxy Issue). I received your message: " + text + (fileToSend ? " [with Image]" : "")
+                            : "🤖 [โหมดจำลอง] เชื่อมต่อเซิร์ฟเวอร์ (n8n) ไม่ได้ หรือ Proxy มีปัญหา แต่ผมได้รับข้อความของคุณแล้ว: " + text + (fileToSend ? " [พร้อมรูปภาพ]" : "");
                         addMessage(errMsg);
                     }, 1000);
                 } finally {
