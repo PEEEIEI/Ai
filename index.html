@@ -6,7 +6,7 @@
     <title>ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้ | AI Friend & Creator</title>
     
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-  
+   
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
@@ -84,6 +84,17 @@
             background-color: #475569;
             border-radius: 20px;
         }
+        
+        /* Horizontal Scroll for Chips */
+        .chips-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+        }
+        .chips-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
         .typing-dot {
             animation: typing 1.4s infinite ease-in-out both;
         }
@@ -168,6 +179,32 @@
         }
         .hidden-menu {
             display: none;
+        }
+
+        /* Mobile Chat Optimization */
+        @media (max-width: 768px) {
+            .mobile-full-screen {
+                height: 100dvh !important;
+                border-radius: 0 !important;
+                border: none !important;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 40;
+                background-color: #0f172a;
+            }
+            .mobile-hide {
+                display: none !important;
+            }
+            main {
+                padding: 0 !important;
+            }
+            /* Hide navbar when in chat on mobile */
+            body.in-chat nav {
+                display: none;
+            }
         }
     </style>
 </head> 
@@ -268,7 +305,7 @@
 
     <input type="file" id="avatar-upload" class="hidden" accept="image/*" onchange="handleAvatarUpload(event)">
 
-    <nav class="w-full p-4 md:p-6 flex flex-col z-20 sticky top-0 backdrop-blur-sm bg-slate-900/10 transition-all">
+    <nav id="main-nav" class="w-full p-4 md:p-6 flex flex-col z-20 sticky top-0 backdrop-blur-sm bg-slate-900/10 transition-all">
         <div class="flex justify-between items-center w-full">
             <div onclick="navigateTo('home')" class="cursor-pointer text-xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 brand-font py-1 leading-relaxed" data-i18n="brand_nav">
                 HIT X CTC
@@ -361,7 +398,7 @@
         </div>
     </nav>
 
-    <main class="flex-grow container mx-auto px-4 py-4 md:py-8 z-10 w-full">
+    <main id="main-container" class="flex-grow container mx-auto px-4 py-4 md:py-8 z-10 w-full">
         
         <div id="view-home" class="view-section flex-col items-center gap-8 md:gap-16 active">
             <section id="home" class="text-center max-w-3xl space-y-6 mt-4 md:mt-10">
@@ -436,13 +473,13 @@
         </div>
 
         <div id="view-chat" class="view-section flex-col items-center">
-            <section class="w-full max-w-6xl bg-slate-900/80 backdrop-blur-xl border-y border-slate-700 md:border md:rounded-3xl shadow-none md:shadow-2xl overflow-hidden flex flex-col h-[85dvh] md:h-[85vh]">
-                <div class="bg-slate-800 p-4 flex items-center gap-4 border-b border-slate-700">
-                    <button onclick="navigateTo('home')" class="md:hidden text-slate-400 hover:text-white mr-2">
+            <section class="w-full max-w-6xl bg-slate-900/80 backdrop-blur-xl border-y border-slate-700 md:border md:rounded-3xl shadow-none md:shadow-2xl overflow-hidden flex flex-col h-[85dvh] md:h-[85vh] mobile-full-screen">
+                <div class="bg-slate-800 p-3 md:p-4 flex items-center gap-4 border-b border-slate-700 z-10 shadow-md">
+                    <button onclick="navigateTo('home')" class="md:hidden text-slate-400 hover:text-white mr-1 p-1 rounded-full hover:bg-slate-700">
                         <i data-lucide="arrow-left" class="w-5 h-5"></i>
                     </button>
-                    <div class="relative group cursor-pointer" onclick="document.getElementById('avatar-upload').click()" title="Click to change avatar">
-                        <div id="header-avatar" class="w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex items-center justify-center text-xl font-bold text-white shadow-lg overflow-hidden border border-slate-600">
+                    <div class="relative group cursor-pointer flex-shrink-0" onclick="document.getElementById('avatar-upload').click()" title="Click to change avatar">
+                        <div id="header-avatar" class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex items-center justify-center text-lg font-bold text-white shadow-lg overflow-hidden border border-slate-600">
                             ต
                         </div>
                         <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -450,18 +487,19 @@
                         </div>
                         <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-800"></div>
                     </div>
-                    <div>
-                        <h3 class="font-bold text-lg" data-i18n="brand_name">ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้</h3>
+                    <div class="flex-grow min-w-0">
+                        <h3 class="font-bold text-base md:text-lg truncate" data-i18n="brand_name">ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้</h3>
                         <p class="text-xs text-slate-400 flex items-center gap-1">
-                            <i id="status-icon" data-lucide="zap" class="w-3 h-3 text-yellow-400"></i> <span id="bot-status-text" data-i18n="online_ready">Online & Ready</span>
+                            <i id="status-icon" data-lucide="zap" class="w-3 h-3 text-yellow-400"></i> <span id="bot-status-text" data-i18n="online_ready">Online</span>
                         </p>
                     </div>
-                    <button onclick="triggerClearChat()" class="ml-auto hidden md:flex items-center gap-2 text-slate-400 hover:text-orange-400 transition" title="Clear Chat History">
-                        <i data-lucide="message-square-off" class="w-5 h-5"></i>
+                    
+                    <button onclick="triggerClearChat()" class="p-2 text-red-400 hover:text-red-300 hover:bg-slate-700/50 rounded-full transition flex items-center justify-center" title="Clear Chat">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
                     </button>
                 </div>
 
-                <div id="messages" class="flex-1 p-4 md:p-6 overflow-y-auto chat-container space-y-4 bg-slate-900/50">
+                <div id="messages" class="flex-1 p-4 md:p-6 overflow-y-auto chat-container space-y-4 bg-slate-900/50 pb-20 md:pb-6">
                     
                     <div class="flex gap-3">
                         <div class="bot-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden">ต</div>
@@ -471,17 +509,17 @@
                         </div>
                     </div>
 
-                    <div id="suggestion-chips" class="flex flex-wrap gap-2 py-2 px-2 justify-center md:justify-start ml-0 md:ml-11">
-                        <button onclick="fillPrompt('ช่วยค้นหาเทรนด์การออกแบบเว็บปี 2024-2025 ให้หน่อย')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-pink-600 hover:text-white hover:border-pink-500 transition shadow-sm flex items-center gap-1">
+                    <div id="suggestion-chips" class="flex md:flex-wrap gap-2 py-2 px-2 justify-start md:justify-start ml-0 md:ml-11 chips-container">
+                        <button onclick="fillPrompt('ช่วยค้นหาเทรนด์การออกแบบเว็บปี 2024-2025 ให้หน่อย')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-pink-600 hover:text-white hover:border-pink-500 transition shadow-sm flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
                             <span>🔍</span> เทรนด์เว็บ 2024
                         </button>
-                        <button onclick="fillPrompt('ช่วยหาตัวอย่างพอร์ตโฟลิโอสาย Web Developer เจ๋งๆ จากอินเทอร์เน็ต')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-violet-600 hover:text-white hover:border-violet-500 transition shadow-sm flex items-center gap-1">
+                        <button onclick="fillPrompt('ช่วยหาตัวอย่างพอร์ตโฟลิโอสาย Web Developer เจ๋งๆ จากอินเทอร์เน็ต')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-violet-600 hover:text-white hover:border-violet-500 transition shadow-sm flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
                             <span>🌐</span> ตัวอย่างพอร์ต Dev
                         </button>
-                        <button onclick="fillPrompt('ช่วยร่างโครงสร้างเนื้อหาสำหรับหน้า Portfolio ของฉัน')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 transition shadow-sm flex items-center gap-1">
+                        <button onclick="fillPrompt('ช่วยร่างโครงสร้างเนื้อหาสำหรับหน้า Portfolio ของฉัน')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 transition shadow-sm flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
                             <span>📝</span> ร่างเนื้อหาพอร์ต
                         </button>
-                        <button onclick="fillPrompt('เขียนโค้ด HTML/Tailwind สำหรับส่วน Hero Section เท่ๆ')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-emerald-600 hover:text-white hover:border-emerald-500 transition shadow-sm flex items-center gap-1">
+                        <button onclick="fillPrompt('เขียนโค้ด HTML/Tailwind สำหรับส่วน Hero Section เท่ๆ')" class="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 hover:bg-emerald-600 hover:text-white hover:border-emerald-500 transition shadow-sm flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
                             <span>💻</span> ขอโค้ด Hero Section
                         </button>
                     </div>
@@ -496,7 +534,7 @@
                     </div>
                 </div>
 
-                <div class="p-3 md:p-4 bg-slate-800 border-t border-slate-700">
+                <div class="p-3 md:p-4 bg-slate-800 border-t border-slate-700 z-10 shadow-[0_-5px_15px_rgba(0,0,0,0.3)]">
                     <form id="chat-form" class="flex gap-2 items-end">
                         <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
                         
@@ -519,7 +557,7 @@
                             <i data-lucide="send-horizontal" class="w-6 h-6"></i>
                         </button>
                     </form>
-                    <div class="text-center mt-2">
+                    <div class="text-center mt-2 mobile-hide">
                         <p class="text-[10px] text-slate-500 uppercase tracking-widest" data-i18n="powered_by">Powered by n8n Webhook</p>
                     </div>
                 </div>
@@ -528,7 +566,7 @@
 
     </main>
 
-    <footer class="text-center p-8 text-slate-500 text-sm z-10" data-i18n="footer">
+    <footer id="main-footer" class="text-center p-8 text-slate-500 text-sm z-10 mobile-hide" data-i18n="footer">
         &copy; 2024 Genius Helper from a Smart Friend. All rights reserved.
     </footer>
 
@@ -627,6 +665,13 @@
             const activeBtn = document.getElementById('nav-' + viewId);
             if(activeBtn) activeBtn.classList.add('nav-btn-active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Mobile specific Logic for cleaner UI
+            if (viewId === 'chat') {
+                document.body.classList.add('in-chat');
+            } else {
+                document.body.classList.remove('in-chat');
+            }
         };
 
         window.toggleMobileMenu = function() {
