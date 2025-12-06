@@ -1,36 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้ | AI Friend & Creator</title>
+    <title>HIT X CTC | AI Friend & Creator</title>
     
+    <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600;700&family=Nunito:wght@400;600;700&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
+    <!-- Markdown & Sanitize -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600;700&family=Nunito:wght@400;600;700&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
     <style>
-        /* Add Sarabun for Thai language support */
+        /* Base Styles */
         body {
             font-family: 'Nunito', 'Sarabun', sans-serif;
             background-color: #0f172a;
             color: #e2e8f0;
             overflow-x: hidden;
+            overscroll-behavior-y: none; 
         }
         h1, h2, h3, .brand-font {
             font-family: 'Fredoka', 'Sarabun', sans-serif;
         }
         
-        /* Optimized Blobs */
+        /* Background Blobs Animation */
         .blob {
             position: absolute;
             filter: blur(60px);
@@ -40,21 +46,81 @@
             animation: float 10s infinite ease-in-out;
         }
         
-        /* Loading Screen */
+        /* Cool Sci-Fi Loader */
         #page-loader {
             position: fixed;
             inset: 0;
-            background-color: #0f172a;
+            background-color: #020617; /* Darker background for contrast */
             z-index: 9999;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            gap: 1rem;
-            transition: opacity 0.5s ease-out, visibility 0.5s;
+            gap: 2rem;
+            transition: opacity 0.6s ease-out, visibility 0.6s;
+        }
+
+        .loader-visual {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+
+        .loader-circle {
+            position: absolute;
+            border: 4px solid transparent;
+            border-radius: 50%;
+        }
+
+        /* Outer Ring */
+        .loader-circle.one {
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-top-color: #ec4899; /* Pink-500 */
+            border-bottom-color: rgba(236, 72, 153, 0.1);
+            animation: spin 1.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.5));
+        }
+
+        /* Middle Ring */
+        .loader-circle.two {
+            top: 12px; left: 12px; right: 12px; bottom: 12px;
+            border-top-color: #8b5cf6; /* Violet-500 */
+            border-right-color: rgba(139, 92, 246, 0.1);
+            animation: spin 2s cubic-bezier(0.5, 0, 0.5, 1) infinite reverse;
+            filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.5));
+        }
+
+        /* Inner Ring */
+        .loader-circle.three {
+            top: 24px; left: 24px; right: 24px; bottom: 24px;
+            border-top-color: #3b82f6; /* Blue-500 */
+            animation: spin 2.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));
+        }
+
+        .loader-text {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #ec4899, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: pulse-glow 2s infinite;
+            font-weight: 700;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 0px transparent); }
+            50% { opacity: 1; filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.6)); }
         }
         
-        /* Animation for Glowing Text Shadow */
+        /* Text Glow Animation */
         .text-glow-anim {
             animation: text-flicker 3s infinite alternate;
         }
@@ -69,6 +135,7 @@
             100% { transform: translate(0, 0) scale(1); }
         }
         
+        /* Chat Scrollbar */
         .chat-container {
             scrollbar-width: thin;
             scrollbar-color: #475569 #1e293b;
@@ -85,16 +152,17 @@
             border-radius: 20px;
         }
         
-        /* Horizontal Scroll for Chips */
+        /* Chips Scroll */
         .chips-container {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
         }
         .chips-container::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+            display: none;
         }
 
+        /* Typing Indicator */
         .typing-dot {
             animation: typing 1.4s infinite ease-in-out both;
         }
@@ -105,13 +173,12 @@
             40% { transform: scale(1); }
         }
         
-        /* Enhanced Markdown Styling with Copy Button Support */
+        /* Markdown Styles */
         .prose p { margin-bottom: 0.5rem; }
         .prose ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.5rem; }
         .prose ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.5rem; }
         .prose code { background: #1e293b; padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #e2e8f0; font-size: 0.9em; }
         
-        /* Code Block Styling */
         .prose pre { 
             background: #0f172a; 
             padding: 1rem; 
@@ -119,7 +186,7 @@
             overflow-x: auto; 
             margin-bottom: 0.5rem; 
             border: 1px solid #334155; 
-            position: relative; /* Needed for absolute positioning of copy button */
+            position: relative; 
         }
         
         .prose pre code { 
@@ -133,7 +200,7 @@
         .prose a { color: #38bdf8; text-decoration: underline; }
         .prose blockquote { border-left: 4px solid #475569; padding-left: 1rem; color: #94a3b8; font-style: italic; }
 
-        /* Modal Styles */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -143,13 +210,13 @@
             height: 100%;
             background-color: rgba(15, 23, 42, 0.9);
             backdrop-filter: blur(5px);
-            z-index: 100;
+            z-index: 9999;
             justify-content: center;
             align-items: center;
         }
         .modal.active { display: flex; }
         
-        /* Navigation Active State */
+        /* Nav & Views */
         .nav-link.active {
             color: white;
             background-color: rgba(255, 255, 255, 0.1);
@@ -161,7 +228,6 @@
             box-shadow: 0 10px 15px -3px rgba(219, 39, 119, 0.3) !important;
         }
         
-        /* View Switching */
         .view-section {
             display: none;
             opacity: 0;
@@ -173,17 +239,13 @@
             opacity: 1;
         }
         
-        /* Mobile Menu z-index fix */
-        #mobile-menu {
-            z-index: 50;
-        }
-        .hidden-menu {
-            display: none;
-        }
+        #mobile-menu { z-index: 50; }
+        .hidden-menu { display: none; }
 
-        /* Mobile Chat Optimization */
+        /* Mobile Optimization */
         @media (max-width: 768px) {
             .mobile-full-screen {
+                height: 100vh !important;
                 height: 100dvh !important;
                 border-radius: 0 !important;
                 border: none !important;
@@ -195,29 +257,37 @@
                 z-index: 40;
                 background-color: #0f172a;
             }
-            .mobile-hide {
-                display: none !important;
-            }
-            main {
-                padding: 0 !important;
-            }
-            /* Hide navbar when in chat on mobile */
-            body.in-chat nav {
-                display: none;
-            }
+            .mobile-hide { display: none !important; }
+            main { padding: 0 !important; }
+            body.in-chat nav { display: none; }
+        }
+
+        /* Tabs Styles */
+        .tab-btn {
+            @apply px-4 py-2 md:px-6 md:py-2 rounded-full text-slate-400 font-medium transition-all duration-300 border border-transparent whitespace-nowrap;
+        }
+        .tab-btn.active {
+            @apply bg-slate-800 text-white border-slate-600 shadow-lg shadow-pink-500/10;
         }
     </style>
 </head> 
 <body class="min-h-screen flex flex-col relative overflow-x-hidden">
 
+    <!-- New Cool Loader -->
     <div id="page-loader">
-        <div class="w-16 h-16 rounded-full border-4 border-slate-700 border-t-pink-500 animate-spin"></div>
-        <p class="text-slate-400 text-sm animate-pulse">กำลังโหลด...</p>
+        <div class="loader-visual">
+            <div class="loader-circle one"></div>
+            <div class="loader-circle two"></div>
+            <div class="loader-circle three"></div>
+        </div>
+        <p class="loader-text">INITIALIZING...</p>
     </div>
 
+    <!-- Background Blobs -->
     <div class="blob bg-purple-600 w-96 h-96 rounded-full top-0 left-0 -translate-x-1/2 -translate-y-1/2"></div>
     <div class="blob bg-blue-600 w-80 h-80 rounded-full bottom-0 right-0 translate-x-1/3 translate-y-1/3"></div>
 
+    <!-- Auth Modal -->
     <div id="auth-modal" class="modal">
         <div class="bg-slate-800 p-8 rounded-3xl border border-slate-600 w-full max-w-md shadow-2xl m-4 relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-pink-500/20 blur-3xl rounded-full pointer-events-none"></div>
@@ -227,18 +297,7 @@
                 <h3 class="text-2xl font-bold mb-2 text-white text-center" data-i18n="login_title">Welcome Back</h3>
                 <p class="text-slate-400 text-center mb-6 text-sm" data-i18n="login_subtitle">Enter your details to sign in</p>
                 
-                <button onclick="handleGoogleLogin()" class="w-full py-3 bg-white text-slate-700 rounded-xl font-bold shadow-lg hover:bg-slate-100 transition transform hover:scale-[1.02] flex items-center justify-center gap-3 mb-4">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M23.766 12.2764C23.766 11.4607 23.6999 10.6406 23.5588 9.83807H12.24V14.4591H18.7217C18.4528 15.9494 17.5885 17.2678 16.323 18.1056V21.1039H20.19C22.4608 19.0139 23.766 15.9274 23.766 12.2764Z" fill="#4285F4"/><path d="M12.2401 24.0008C15.4766 24.0008 18.2059 22.9382 20.1945 21.1039L16.3275 18.1055C15.2517 18.8375 13.8627 19.252 12.2445 19.252C9.11388 19.252 6.45946 17.1399 5.50705 14.3003H1.5166V17.3912C3.55371 21.4434 7.7029 24.0008 12.2401 24.0008Z" fill="#34A853"/><path d="M5.50253 14.3003C5.00236 12.8099 5.00236 11.1961 5.50253 9.70575V6.61481H1.51649C-0.18551 10.0056 -0.18551 14.0004 1.51649 17.3912L5.50253 14.3003Z" fill="#FBBC05"/><path d="M12.2401 4.74966C13.9509 4.7232 15.6044 5.36697 16.8434 6.54867L20.2695 3.12262C18.1001 1.0855 15.2208 -0.034466 12.2401 0.000808666C7.7029 0.000808666 3.55371 2.55822 1.5166 6.61481L5.50264 9.70575C6.45064 6.86173 9.10947 4.74966 12.2401 4.74966Z" fill="#EA4335"/></svg>
-                    <span>Google (Demo Mode)</span>
-                </button>
-
-                <div class="relative flex py-2 items-center">
-                    <div class="flex-grow border-t border-slate-600"></div>
-                    <span class="flex-shrink-0 mx-4 text-slate-500 text-xs">Or continue with email</span>
-                    <div class="flex-grow border-t border-slate-600"></div>
-                </div>
-                
-                <form onsubmit="handleLogin(event)" class="space-y-4 mt-4">
+                <form onsubmit="handleLogin(event)" class="space-y-4 mt-6">
                     <input type="email" id="login-email" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="name@example.com">
                     <input type="password" id="login-password" required class="w-full bg-slate-900/50 border border-slate-600 rounded-xl p-3 text-white focus:ring-2 focus:ring-pink-500 outline-none transition" placeholder="••••••••">
                     <button type="submit" class="w-full py-3 bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white rounded-xl font-bold shadow-lg shadow-pink-500/25 transition transform hover:scale-[1.02]">
@@ -284,8 +343,9 @@
         </div>
     </div>
 
+    <!-- Confirm Modal -->
     <div id="confirm-modal" class="modal">
-        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-600 w-full max-w-sm shadow-2xl m-4 text-center">
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-600 w-full max-w-sm shadow-2xl m-4 text-center relative z-50">
             <div class="w-16 h-16 bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4 text-orange-400">
                 <i data-lucide="alert-triangle" class="w-8 h-8"></i>
             </div>
@@ -305,6 +365,7 @@
 
     <input type="file" id="avatar-upload" class="hidden" accept="image/*" onchange="handleAvatarUpload(event)">
 
+    <!-- Navbar -->
     <nav id="main-nav" class="w-full p-4 md:p-6 flex flex-col z-20 sticky top-0 backdrop-blur-sm bg-slate-900/10 transition-all">
         <div class="flex justify-between items-center w-full">
             <div onclick="navigateTo('home')" class="cursor-pointer text-xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500 brand-font py-1 leading-relaxed" data-i18n="brand_nav">
@@ -398,8 +459,10 @@
         </div>
     </nav>
 
+    <!-- Main Content -->
     <main id="main-container" class="flex-grow container mx-auto px-4 py-4 md:py-8 z-10 w-full">
         
+        <!-- HOME VIEW -->
         <div id="view-home" class="view-section flex-col items-center gap-8 md:gap-16 active">
             <section id="home" class="text-center max-w-3xl space-y-6 mt-4 md:mt-10">
                 <div class="inline-block px-4 py-1 rounded-full bg-slate-800 border border-slate-700 text-sm text-pink-400 mb-4 animate-bounce shadow-[0_0_15px_rgba(236,72,153,0.3)]" data-i18n="meet_companion">
@@ -407,7 +470,7 @@
                 </div>
                 <h1 class="text-4xl md:text-6xl font-bold leading-[1.6] md:leading-[1.6] py-4">
                     <span class="drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]" data-i18n="hero_title_prefix">Hey, I'm</span> 
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 inline-block text-glow-anim" data-i18n="brand_name">ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้</span>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 inline-block text-glow-anim" data-i18n="brand_name">HIT X CTC</span>
                 </h1>
                 <p class="text-xl text-slate-400 drop-shadow-md" data-i18n="hero_desc">
                     A digital creator and your personal AI friend. Let's talk about ideas, code, or just vibe. Drop an image, ask a question, and let's create something cool.
@@ -418,62 +481,206 @@
                 </button>
             </section>
 
+            <!-- Guide Section with Tabs -->
             <section class="w-full max-w-5xl mt-8 md:mt-12 pb-0">
-                    <h2 class="text-2xl font-bold text-center mb-8 text-white border-b border-slate-700 pb-4 inline-block mx-auto" data-i18n="how_to_use">How to use / Features</h2>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-pink-500/50 transition duration-300">
-                            <div class="w-12 h-12 bg-pink-500/20 rounded-xl flex items-center justify-center mb-4 text-pink-400">
-                                <i data-lucide="message-circle" class="w-6 h-6"></i>
-                            </div>
-                            <h3 class="text-xl font-bold mb-2 text-white" data-i18n="feat_chat_title">Smart Chat</h3>
-                            <p class="text-slate-400 text-sm" data-i18n="feat_chat_desc">
-                                Ask me anything! From coding help to creative writing, or just a friendly conversation. I'm here to assist.
-                            </p>
-                        </div>
+                <!-- Tab Buttons -->
+                <div class="flex justify-center flex-wrap gap-2 mb-8 bg-slate-800/50 p-1.5 rounded-full inline-flex mx-auto border border-slate-700/50 backdrop-blur-md">
+                    <button onclick="switchTab('usage')" id="tab-usage" class="tab-btn active text-sm md:text-base flex items-center gap-2">
+                        <i data-lucide="bot" class="w-4 h-4"></i> <span data-i18n="tab_ai_guide">คู่มือ AI</span>
+                    </button>
+                    <button onclick="switchTab('github')" id="tab-github" class="tab-btn text-sm md:text-base flex items-center gap-2">
+                        <i data-lucide="github" class="w-4 h-4"></i> <span data-i18n="tab_github">วิธีสมัคร GitHub</span>
+                    </button>
+                    <!-- New Tab Button -->
+                    <button onclick="switchTab('project')" id="tab-project" class="tab-btn text-sm md:text-base flex items-center gap-2">
+                        <i data-lucide="folder-plus" class="w-4 h-4"></i> <span data-i18n="tab_project">วิธีสร้างโปรเจค</span>
+                    </button>
+                </div>
 
-                        <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-violet-500/50 transition duration-300">
-                            <div class="w-12 h-12 bg-violet-500/20 rounded-xl flex items-center justify-center mb-4 text-violet-400">
-                                <i data-lucide="image" class="w-6 h-6"></i>
-                            </div>
-                            <h3 class="text-xl font-bold mb-2 text-white" data-i18n="feat_image_title">Image Analysis</h3>
-                            <p class="text-slate-400 text-sm" data-i18n="feat_image_desc">
-                                Upload an image in the chat, and I can describe it, extract text, or answer questions about it.
-                            </p>
+                <!-- Content: AI Usage Guide -->
+                <div id="content-usage" class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
+                    <!-- Step 1 -->
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-pink-500/50 transition duration-300 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <span class="text-6xl font-bold text-pink-500">01</span>
                         </div>
+                        <div class="w-12 h-12 bg-pink-500/20 rounded-xl flex items-center justify-center mb-4 text-pink-400">
+                            <i data-lucide="message-square" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white" data-i18n="guide_step1_title">Start Chatting</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="guide_step1_desc">
+                            Click the "AI Friend" button or "Start Chatting Now". Type your questions, coding requests, or ideas in the chat box.
+                        </p>
                     </div>
-            </section>
 
-            <section class="w-full max-w-5xl mt-12 mb-20 border-t border-slate-800 pt-12">
-                <h2 class="text-2xl font-bold text-center mb-8 text-white" data-i18n="steps_title">Get Started in 3 Steps</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50 flex flex-col items-center text-center hover:bg-slate-800/50 transition duration-300">
-                        <div class="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mb-4 text-blue-400 font-bold text-xl">
-                            <i data-lucide="code" class="w-6 h-6"></i>
+                    <!-- Step 2 -->
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-violet-500/50 transition duration-300 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <span class="text-6xl font-bold text-violet-500">02</span>
                         </div>
-                        <h3 class="text-lg font-bold mb-2 text-white" data-i18n="step_1">Web Developer Expert</h3>
-                        <p class="text-slate-400 text-sm" data-i18n="step_1_desc">Generate beautiful portfolios and modern websites with HTML/CSS code.</p>
+                        <div class="w-12 h-12 bg-violet-500/20 rounded-xl flex items-center justify-center mb-4 text-violet-400">
+                            <i data-lucide="paperclip" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white" data-i18n="guide_step2_title">Upload Files</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="guide_step2_desc">
+                            Need analysis? Click the paperclip icon to upload documents or images for analysis. I can read and summarize them for you.
+                        </p>
                     </div>
-                    <div class="bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50 flex flex-col items-center text-center hover:bg-slate-800/50 transition duration-300">
-                        <div class="w-12 h-12 bg-pink-500/20 rounded-full flex items-center justify-center mb-4 text-pink-400 font-bold text-xl">
-                            <i data-lucide="search" class="w-6 h-6"></i>
+
+                    <!-- Step 3 -->
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition duration-300 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <span class="text-6xl font-bold text-blue-500">03</span>
                         </div>
-                        <h3 class="text-lg font-bold mb-2 text-white" data-i18n="step_2">Information Researcher</h3>
-                        <p class="text-slate-400 text-sm" data-i18n="step_2_desc">Find real-time facts and summarize information from reliable sources.</p>
+                        <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4 text-blue-400">
+                            <i data-lucide="zap" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white" data-i18n="guide_step3_title">Smart Prompts</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="guide_step3_desc">
+                            Use specific commands like "Write HTML code", "Summarize this news", or "Create a portfolio structure" for best results.
+                        </p>
                     </div>
-                    <div class="bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50 flex flex-col items-center text-center hover:bg-slate-800/50 transition duration-300">
-                        <div class="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mb-4 text-purple-400 font-bold text-xl">
-                            <i data-lucide="image" class="w-6 h-6"></i>
+
+                    <!-- Step 4 -->
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-emerald-500/50 transition duration-300 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <span class="text-6xl font-bold text-emerald-500">04</span>
                         </div>
-                        <h3 class="text-lg font-bold mb-2 text-white" data-i18n="step_3">Image Generator</h3>
-                        <p class="text-slate-400 text-sm" data-i18n="step_3_desc">Create stunning images from your imagination using DALL-E.</p>
+                        <div class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-4 text-emerald-400">
+                            <i data-lucide="code-2" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white" data-i18n="guide_step4_title">Get Results</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="guide_step4_desc">
+                            Receive instant code snippets, summaries, or creative content. Copy code directly or view live previews.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Content: GitHub Signup Guide -->
+                <div id="content-github" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
+                    <!-- GitHub Step 1 -->
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-white/50 transition duration-300 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <span class="text-6xl font-bold text-white">01</span>
+                        </div>
+                        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-4 text-white">
+                            <i data-lucide="globe" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white" data-i18n="gh_step1_title">Go to Website</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="gh_step1_desc">
+                            Visit <strong>github.com</strong> and click on the "Sign up" button at the top right corner.
+                        </p>
+                    </div>
+
+                    <!-- GitHub Step 2 -->
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-white/50 transition duration-300 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <span class="text-6xl font-bold text-white">02</span>
+                        </div>
+                        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-4 text-white">
+                            <i data-lucide="mail" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white" data-i18n="gh_step2_title">Enter Details</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="gh_step2_desc">
+                            Enter your email address, create a strong password, and choose a unique username.
+                        </p>
+                    </div>
+
+                    <!-- GitHub Step 3 -->
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-white/50 transition duration-300 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <span class="text-6xl font-bold text-white">03</span>
+                        </div>
+                        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-4 text-white">
+                            <i data-lucide="shield-check" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white" data-i18n="gh_step3_title">Verify Account</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="gh_step3_desc">
+                            Complete the puzzle challenge to prove you are human, then check your email for the launch code.
+                        </p>
+                    </div>
+
+                    <!-- GitHub Step 4 -->
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-white/50 transition duration-300 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <span class="text-6xl font-bold text-white">04</span>
+                        </div>
+                        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-4 text-white">
+                            <i data-lucide="check-circle" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white" data-i18n="gh_step4_title">Complete</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="gh_step4_desc">
+                            Enter the code from email. You are now ready to create your first repository!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Content: Create Project Guide (New) -->
+                <div id="content-project" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
+                    <!-- Project Step 1 -->
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-green-500/50 transition duration-300 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <span class="text-6xl font-bold text-green-500">01</span>
+                        </div>
+                        <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-4 text-green-400">
+                            <i data-lucide="plus-square" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white" data-i18n="proj_step1_title">Create New Repo</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="proj_step1_desc">
+                            Log in to GitHub. Click the "+" icon in the top-right corner and select "New repository".
+                        </p>
+                    </div>
+
+                    <!-- Project Step 2 -->
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-green-500/50 transition duration-300 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <span class="text-6xl font-bold text-green-500">02</span>
+                        </div>
+                        <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-4 text-green-400">
+                            <i data-lucide="edit-3" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white" data-i18n="proj_step2_title">Name & Info</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="proj_step2_desc">
+                            Enter a "Repository name". Add a description (optional) to explain your project.
+                        </p>
+                    </div>
+
+                    <!-- Project Step 3 -->
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-green-500/50 transition duration-300 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <span class="text-6xl font-bold text-green-500">03</span>
+                        </div>
+                        <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-4 text-green-400">
+                            <i data-lucide="lock" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white" data-i18n="proj_step3_title">Visibility</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="proj_step3_desc">
+                            Choose "Public" (everyone can see) or "Private" (only you can see). Public is free and good for portfolios.
+                        </p>
+                    </div>
+
+                    <!-- Project Step 4 -->
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-green-500/50 transition duration-300 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <span class="text-6xl font-bold text-green-500">04</span>
+                        </div>
+                        <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-4 text-green-400">
+                            <i data-lucide="check" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white" data-i18n="proj_step4_title">Create</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="proj_step4_desc">
+                            Click "Create repository". Done! You can now upload files or push code to your new project.
+                        </p>
                     </div>
                 </div>
             </section>
+            
+            <div class="mb-20"></div> 
         </div>
 
+        <!-- CHAT VIEW -->
         <div id="view-chat" class="view-section flex-col items-center">
-            <section class="w-full max-w-6xl bg-slate-900/80 backdrop-blur-xl border-y border-slate-700 md:border md:rounded-3xl shadow-none md:shadow-2xl overflow-hidden flex flex-col h-[85dvh] md:h-[85vh] mobile-full-screen">
+            <section class="w-full max-w-6xl bg-slate-900/80 backdrop-blur-xl border-y border-slate-700 md:border md:rounded-3xl shadow-none md:shadow-2xl overflow-hidden flex flex-col h-[85vh] mobile-full-screen">
                 <div class="bg-slate-800 p-3 md:p-4 flex items-center gap-4 border-b border-slate-700 z-10 shadow-md">
                     <button onclick="navigateTo('home')" class="md:hidden text-slate-400 hover:text-white mr-1 p-1 rounded-full hover:bg-slate-700">
                         <i data-lucide="arrow-left" class="w-5 h-5"></i>
@@ -488,7 +695,7 @@
                         <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-800"></div>
                     </div>
                     <div class="flex-grow min-w-0">
-                        <h3 class="font-bold text-base md:text-lg truncate" data-i18n="brand_name">ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้</h3>
+                        <h3 class="font-bold text-base md:text-lg truncate" data-i18n="brand_name">HIT X CTC</h3>
                         <p class="text-xs text-slate-400 flex items-center gap-1">
                             <i id="status-icon" data-lucide="zap" class="w-3 h-3 text-yellow-400"></i> <span id="bot-status-text" data-i18n="online_ready">Online</span>
                         </p>
@@ -504,7 +711,7 @@
                     <div class="flex gap-3">
                         <div class="bot-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden">ต</div>
                         <div class="bg-slate-800 text-slate-200 p-4 rounded-2xl rounded-tl-none max-w-[85%] border border-slate-700 shadow-md">
-                            <p data-i18n="welcome_msg">Hello! I'm Genius Helper from a Smart Friend. 👋</p>
+                            <p data-i18n="welcome_msg">Hello! I'm HIT X CTC. 👋</p>
                             <p class="mt-2 text-slate-300 text-sm" data-i18n="welcome_sub">You can send me text messages or upload images for me to analyze. How can I help you today?</p>
                         </div>
                     </div>
@@ -525,10 +732,25 @@
                     </div>
                 </div>
 
-                <div id="image-preview-container" class="hidden px-4 pt-2 bg-slate-800/50 border-t border-slate-700">
-                    <div class="relative inline-block">
-                        <img id="image-preview" src="" alt="Preview" class="h-20 rounded-lg border border-slate-600 shadow-sm">
-                        <button onclick="clearImage()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition shadow-sm">
+                <!-- Enhanced File Preview Container -->
+                <div id="file-preview-container" class="hidden px-4 pt-2 bg-slate-800/50 border-t border-slate-700">
+                    <div class="relative inline-flex items-center gap-3 p-2 bg-slate-700/50 rounded-xl border border-slate-600/50">
+                        <!-- Image Preview -->
+                        <img id="image-preview-element" alt="Preview" class="hidden h-14 w-auto rounded-lg object-contain border border-slate-500">
+                        
+                        <!-- File Icon Preview -->
+                        <div id="file-preview-icon" class="hidden w-10 h-10 bg-slate-600 rounded-lg flex items-center justify-center text-slate-300">
+                            <i data-lucide="file-text" class="w-6 h-6"></i>
+                        </div>
+
+                        <!-- File Info -->
+                        <div class="flex flex-col">
+                            <span id="preview-filename" class="text-xs text-slate-200 font-medium max-w-[150px] truncate"></span>
+                            <span id="preview-filesize" class="text-[10px] text-slate-400"></span>
+                        </div>
+
+                        <!-- Clear Button -->
+                        <button id="clear-file-btn" onclick="clearFileSelection(true)" class="ml-2 p-1 bg-slate-600 hover:bg-red-500/80 text-white rounded-full transition shadow-sm">
                             <i data-lucide="x" class="w-3 h-3"></i>
                         </button>
                     </div>
@@ -536,10 +758,12 @@
 
                 <div class="p-3 md:p-4 bg-slate-800 border-t border-slate-700 z-10 shadow-[0_-5px_15px_rgba(0,0,0,0.3)]">
                     <form id="chat-form" class="flex gap-2 items-end">
-                        <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+                        <!-- File Input (Removed Accept restriction) -->
+                        <input type="file" id="file-input" class="hidden" onchange="handleFileSelect(event)">
                         
-                        <button type="button" onclick="document.getElementById('file-input').click()" class="p-3 text-slate-400 hover:text-pink-400 hover:bg-slate-700 rounded-xl transition flex-shrink-0" title="Upload Image">
-                            <i data-lucide="image-plus" class="w-6 h-6"></i>
+                        <!-- Changed Icon to Paperclip -->
+                        <button type="button" onclick="document.getElementById('file-input').click()" class="p-3 text-slate-400 hover:text-pink-400 hover:bg-slate-700 rounded-xl transition flex-shrink-0" title="Upload File">
+                            <i data-lucide="paperclip" class="w-6 h-6"></i>
                         </button>
                         
                         <div class="flex-grow relative">
@@ -557,9 +781,6 @@
                             <i data-lucide="send-horizontal" class="w-6 h-6"></i>
                         </button>
                     </form>
-                    <div class="text-center mt-2 mobile-hide">
-                        <p class="text-[10px] text-slate-500 uppercase tracking-widest" data-i18n="powered_by">Powered by n8n Webhook</p>
-                    </div>
                 </div>
             </section>
         </div>
@@ -567,7 +788,7 @@
     </main>
 
     <footer id="main-footer" class="text-center p-8 text-slate-500 text-sm z-10 mobile-hide" data-i18n="footer">
-        &copy; 2024 Genius Helper from a Smart Friend. All rights reserved.
+        &copy; 2024 HIT X CTC. All rights reserved.
     </footer>
 
     <script>
@@ -595,41 +816,67 @@
                 home: "Home", about: "About", ai_friend: "AI Friend", chat_now: "Chat Now",
                 meet_companion: "✨ Meet your new AI Companion", hero_title_prefix: "Hey, I'm",
                 hero_desc: "A digital creator and your personal AI friend. Let's talk about ideas, code, or just vibe. Drop an image, ask a question, and let's create something cool.",
-                brand_nav: "HIT X CTC", brand_name: "Genius Helper from a Smart Friend", online_ready: "Online & Ready",
-                welcome_msg: "Hello! I'm Genius Helper from a Smart Friend. 👋",
+                brand_nav: "HIT X CTC", brand_name: "HIT X CTC", online_ready: "Online & Ready",
+                welcome_msg: "Hello! I'm HIT X CTC. 👋",
                 welcome_sub: "You can send me text messages or upload images for me to analyze. How can I help you today?",
                 placeholder_input: "Type a message...", powered_by: "Powered by n8n Webhook",
-                footer: "© 2024 Genius Helper from a Smart Friend. All rights reserved.",
+                footer: "© 2024 HIT X CTC. All rights reserved.",
                 error_msg: "⚠️ Oops! Something went wrong connecting to the AI. Please try again.",
-                you: "You", start_chatting_btn: "Start Chatting Now 🚀", how_to_use: "How to use / Features",
-                feat_chat_title: "Smart Chat", feat_chat_desc: "Ask me anything! From coding help to creative writing, or just a friendly conversation.",
-                feat_image_title: "Image Analysis", feat_image_desc: "Upload an image in the chat, and I can describe it, extract text, or answer questions about it.",
+                you: "You", start_chatting_btn: "Start Chatting Now 🚀", 
+                how_to_use: "Comprehensive Guide",
                 login_title: "Welcome Back", login_subtitle: "Enter your details to sign in", btn_login: "Sign In",
                 signup_title: "Create Account", signup_subtitle: "Join us and start creating", btn_signup: "Create Account",
-                steps_title: "Get Started in 3 Steps", 
-                step_1: "Web Developer Expert", step_1_desc: "Generate beautiful portfolios and modern websites with HTML/CSS code.",
-                step_2: "Information Researcher", step_2_desc: "Find real-time facts and summarize information from reliable sources.",
-                step_3: "Image Generator", step_3_desc: "Create stunning images from your imagination using DALL-E."
+                // Removed steps_title block as requested by deletion
+                // New Guide Translations
+                guide_step1_title: "Start Chatting", guide_step1_desc: "Click 'AI Friend' and type your question in the chat box.",
+                guide_step2_title: "Upload Files", guide_step2_desc: "Click the paperclip icon to upload documents or images for analysis.",
+                guide_step3_title: "Smart Prompts", guide_step3_desc: "Use clear commands like 'Write code' or 'Summarize' for best results.",
+                guide_step4_title: "Get Results", guide_step4_desc: "Receive instant answers, code, or creative content ready to use.",
+                // Tabs
+                tab_ai_guide: "AI Guide", tab_github: "GitHub Signup", tab_project: "Create Project",
+                // GitHub Guide
+                gh_step1_title: "Go to Website", gh_step1_desc: "Visit github.com and click 'Sign up'.",
+                gh_step2_title: "Enter Details", gh_step2_desc: "Enter email, password, and username.",
+                gh_step3_title: "Verify", gh_step3_desc: "Solve puzzle and verify email code.",
+                gh_step4_title: "Complete", gh_step4_desc: "You are ready to code!",
+                // Project Guide
+                proj_step1_title: "Create New Repo", proj_step1_desc: "Log in. Click '+' icon top-right > 'New repository'.",
+                proj_step2_title: "Name & Info", proj_step2_desc: "Enter 'Repository name'. Add a description (optional).",
+                proj_step3_title: "Visibility", proj_step3_desc: "Select 'Public' (for portfolio) or 'Private'.",
+                proj_step4_title: "Create", proj_step4_desc: "Click 'Create repository'. You're ready to upload files!"
             },
             th: {
                 home: "หน้าแรก", about: "เกี่ยวกับ", ai_friend: "เพื่อน AI", chat_now: "เริ่มแชท",
                 meet_companion: "✨ พบกับเพื่อน AI คนใหม่ของคุณ", hero_title_prefix: "สวัสดีครับ ผม",
                 hero_desc: "นักสร้างสรรค์ดิจิทัลและเพื่อน AI ส่วนตัวของคุณ มาคุยเรื่องไอเดีย เขียนโค้ด หรือแค่นั่งคุยเล่น ส่งรูป ถามคำถาม แล้วมาสร้างสรรค์อะไรเจ๋งๆ กันเถอะ",
-                brand_nav: "HIT X CTC", brand_name: "ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้", online_ready: "ออนไลน์ & พร้อมใช้งาน",
-                welcome_msg: "สวัสดีครับ! ผม ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้ ครับ 👋",
+                brand_nav: "HIT X CTC", brand_name: "HIT X CTC", online_ready: "ออนไลน์ & พร้อมใช้งาน",
+                welcome_msg: "สวัสดีครับ! ผม HIT X CTC ครับ 👋",
                 welcome_sub: "คุณสามารถส่งข้อความหรืออัปโหลดรูปภาพให้ผมวิเคราะห์ได้เลย วันนี้ให้ผมช่วยอะไรดีครับ?",
                 placeholder_input: "พิมพ์ข้อความที่นี่...", powered_by: "ขับเคลื่อนโดย n8n Webhook",
-                footer: "© 2024 ตัวช่วยอัจฉริยะจากเพื่อนแสนรู้. สงวนลิขสิทธิ์",
+                footer: "© 2024 HIT X CTC. สงวนลิขสิทธิ์",
                 error_msg: "⚠️ อุ๊ย! เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง",
-                you: "คุณ", start_chatting_btn: "เริ่มแชทเลย 🚀", how_to_use: "วิธีใช้งาน / ฟีเจอร์เด่น",
-                feat_chat_title: "แชทอัจฉริยะ", feat_chat_desc: "ถามอะไรก็ได้! ตั้งแต่เรื่องโค้ด เขียนบทความ หรือแค่คุยเล่นแก้เหงา",
-                feat_image_title: "วิเคราะห์รูปภาพ", feat_image_desc: "ส่งรูปมาให้ผมดู ผมช่วยบรรยายรูป อ่านข้อความในภาพได้",
+                you: "คุณ", start_chatting_btn: "เริ่มแชทเลย 🚀", 
+                how_to_use: "คู่มือการใช้งานแบบละเอียด",
                 login_title: "ยินดีต้อนรับกลับ", login_subtitle: "กรอกข้อมูลเพื่อเข้าสู่ระบบ", btn_login: "เข้าสู่ระบบ",
                 signup_title: "สร้างบัญชีใหม่", signup_subtitle: "มาร่วมสร้างสรรค์ไปกับเรา", btn_signup: "สมัครสมาชิก",
-                steps_title: "เริ่มต้นง่ายๆ ใน 3 ขั้นตอน", 
-                step_1: "ผู้เชี่ยวชาญด้านเว็บ", step_1_desc: "สร้างพอร์ตโฟลิโอและเว็บสวยๆ ด้วยโค้ด HTML/CSS ทันสมัย",
-                step_2: "นักสืบค้นข้อมูล", step_2_desc: "ค้นหาความจริง ข่าวสารล่าสุด และสรุปข้อมูลให้อ่านง่าย",
-                step_3: "นักสร้างสรรค์ภาพ", step_3_desc: "เนรมิตรูปภาพสวยๆ จากจินตนาการของคุณด้วย AI"
+                // Removed steps_title block as requested by deletion
+                // New Guide Translations
+                guide_step1_title: "เริ่มต้นสนทนา", guide_step1_desc: "คลิกปุ่ม 'เพื่อน AI' แล้วพิมพ์คำถามหรือหัวข้อที่ต้องการในช่องแชท",
+                guide_step2_title: "อัปโหลดไฟล์", guide_step2_desc: "คลิกไอคอนคลิปหนีบกระดาษ เพื่อส่งรูปภาพ PDF หรือเอกสารให้ AI วิเคราะห์",
+                guide_step3_title: "สั่งงาน AI", guide_step3_desc: "ใช้คำสั่งที่ชัดเจน เช่น 'ขอโค้ด...' หรือ 'สรุปไฟล์นี้...' เพื่อผลลัพธ์ที่ดีที่สุด",
+                guide_step4_title: "นำไปใช้งาน", guide_step4_desc: "รับคำตอบ โค้ด หรือเนื้อหาที่ AI สร้างให้ แล้วคัดลอกไปใช้งานได้ทันที",
+                // Tabs
+                tab_ai_guide: "คู่มือ AI", tab_github: "วิธีสมัคร GitHub", tab_project: "วิธีสร้างโปรเจค",
+                // GitHub Guide
+                gh_step1_title: "เข้าเว็บไซต์", gh_step1_desc: "ไปที่ github.com แล้วกดปุ่ม 'Sign up' มุมขวาบน",
+                gh_step2_title: "กรอกข้อมูล", gh_step2_desc: "ใส่อีเมล ตั้งรหัสผ่านที่รัดกุม และตั้งชื่อผู้ใช้ (Username)",
+                gh_step3_title: "ยืนยันตัวตน", gh_step3_desc: "แก้ปริศนาเพื่อยืนยันว่าเป็นคน และนำรหัสจากอีเมลมากรอก",
+                gh_step4_title: "เสร็จสิ้น", gh_step4_desc: "เข้าสู่ระบบเรียบร้อย พร้อมเริ่มสร้าง Repository แรกของคุณ!",
+                // Project Guide
+                proj_step1_title: "สร้าง Repo ใหม่", proj_step1_desc: "ล็อกอิน GitHub คลิกเครื่องหมาย '+' มุมขวาบน > เลือก 'New repository'",
+                proj_step2_title: "ตั้งชื่อโปรเจค", proj_step2_desc: "ใส่ชื่อในช่อง 'Repository name' และคำอธิบายสั้นๆ (Description)",
+                proj_step3_title: "ตั้งค่าการมองเห็น", proj_step3_desc: "เลือก Public (ทุกคนเห็นได้/ฟรี) หรือ Private (ส่วนตัว) ตามต้องการ",
+                proj_step4_title: "สร้างเลย!", proj_step4_desc: "กดปุ่ม 'Create repository' ด้านล่างสุด ก็พร้อมอัปโหลดโค้ดแล้วครับ"
             }
         };
 
@@ -650,6 +897,27 @@
             currentLang = currentLang === 'en' ? 'th' : 'en';
             localStorage.setItem('app_language', currentLang);
             updateContent();
+            updateChatWelcomeMessage(); // Refresh welcome message text
+        };
+
+        function updateChatWelcomeMessage() {
+             const welcomeMsg = document.querySelector('[data-i18n="welcome_msg"]');
+             const welcomeSub = document.querySelector('[data-i18n="welcome_sub"]');
+             if(welcomeMsg) welcomeMsg.innerText = translations[currentLang].welcome_msg;
+             if(welcomeSub) welcomeSub.innerText = translations[currentLang].welcome_sub;
+        }
+
+        // New Tab Switcher Function
+        window.switchTab = function(tabName) {
+            // Update Buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            
+            // Update Content
+            document.getElementById('content-usage').classList.add('hidden');
+            document.getElementById('content-github').classList.add('hidden');
+            document.getElementById('content-project').classList.add('hidden');
+            document.getElementById('content-' + tabName).classList.remove('hidden');
         };
 
         window.navigateTo = function(viewId) {
@@ -659,6 +927,7 @@
             });
             const selected = document.getElementById('view-' + viewId);
             selected.style.display = 'flex';
+            // Small delay to allow display:flex to apply before adding opacity
             setTimeout(() => selected.classList.add('active'), 10);
             
             document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('nav-btn-active'));
@@ -669,6 +938,7 @@
             // Mobile specific Logic for cleaner UI
             if (viewId === 'chat') {
                 document.body.classList.add('in-chat');
+                scrollToBottom();
             } else {
                 document.body.classList.remove('in-chat');
             }
@@ -842,28 +1112,82 @@
             input.focus();
         };
         
-        window.clearImage = function() {
+        // UPDATED: clearFileSelection to replace clearImage with loading spinner support
+        window.clearFileSelection = function(isManual = false) {
+            if (isManual) {
+                const btn = document.getElementById('clear-file-btn');
+                const originalContent = btn.innerHTML;
+                
+                // Show loader
+                btn.innerHTML = '<div class="animate-spin w-3 h-3 border-2 border-white border-t-transparent rounded-full"></div>';
+                btn.disabled = true;
+                
+                // UX Delay
+                setTimeout(() => {
+                    performClear();
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                    if(typeof lucide !== 'undefined') lucide.createIcons();
+                }, 600);
+            } else {
+                performClear();
+            }
+        };
+
+        function performClear() {
             selectedFile = null;
             document.getElementById('file-input').value = '';
-            document.getElementById('image-preview').src = '';
-            document.getElementById('image-preview-container').classList.add('hidden');
-        };
+            document.getElementById('file-preview-container').classList.add('hidden');
+            
+            const img = document.getElementById('image-preview-element');
+            
+            // Fix for broken image icon showing on some browsers
+            img.style.display = 'none'; // Force hide using inline style
+            img.src = ''; 
+            
+            document.getElementById('file-preview-icon').classList.add('hidden');
+        }
         
+        // UPDATED: Handle any file type
         window.handleFileSelect = function(e) {
             const file = e.target.files[0];
-            if(file) {
-                selectedFile = file;
+            if (!file) return;
+            selectedFile = file;
+            
+            const container = document.getElementById('file-preview-container');
+            const imgPrev = document.getElementById('image-preview-element');
+            const iconPrev = document.getElementById('file-preview-icon');
+            const namePrev = document.getElementById('preview-filename');
+            const sizePrev = document.getElementById('preview-filesize');
+            
+            namePrev.textContent = file.name;
+            sizePrev.textContent = (file.size / 1024).toFixed(1) + ' KB';
+            container.classList.remove('hidden');
+
+            // If it's an image, show preview
+            if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = (ev) => {
-                    document.getElementById('image-preview').src = ev.target.result;
-                    document.getElementById('image-preview-container').classList.remove('hidden');
+                    imgPrev.src = ev.target.result;
+                    imgPrev.classList.remove('hidden');
+                    imgPrev.style.display = 'block'; // Force show
+                    iconPrev.classList.add('hidden');
                 };
                 reader.readAsDataURL(file);
+            } else {
+                // Not an image, show generic icon
+                imgPrev.src = '';
+                imgPrev.style.display = 'none'; // Force hide
+                imgPrev.classList.add('hidden');
+                iconPrev.classList.remove('hidden');
             }
         };
 
         window.handleEnter = function(e) {
-            if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('chat-form').dispatchEvent(new Event('submit')); }
+            if(e.key === 'Enter' && !e.shiftKey) { 
+                e.preventDefault(); 
+                document.getElementById('chat-form').dispatchEvent(new Event('submit')); 
+            }
         };
 
         window.handleAvatarUpload = function(e) {
@@ -880,6 +1204,13 @@
         };
 
         // --- Chat Rendering ---
+        function scrollToBottom() {
+             const container = document.getElementById('messages');
+             setTimeout(() => {
+                 container.scrollTop = container.scrollHeight;
+             }, 50);
+        }
+
         function loadChatHistory() {
             try {
                 const stored = localStorage.getItem('chat_history');
@@ -902,12 +1233,13 @@
                 `;
                 container.insertAdjacentHTML('afterbegin', welcomeHtml);
 
-                chatHistory.forEach(msg => renderMessage(msg.content, msg.isUser, msg.imageUrl));
+                // UPDATED: Load message with attachment info if available
+                chatHistory.forEach(msg => renderMessage(msg.content, msg.isUser, msg.imageUrl, msg.attachment));
                 
                 const chips = document.getElementById('suggestion-chips');
                 if(chips) chips.classList.add('hidden');
                 
-                setTimeout(() => container.scrollTop = container.scrollHeight, 100);
+                scrollToBottom();
             }
         }
 
@@ -950,7 +1282,8 @@
             });
         }
 
-        function renderMessage(content, isUser, imageUrl) {
+        // UPDATED: Render Message to support File Attachments
+        function renderMessage(content, isUser, imageUrl, attachment) {
             const container = document.getElementById('messages');
             const wrapper = document.createElement('div');
             wrapper.className = `flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`;
@@ -971,24 +1304,44 @@
             const bubble = document.createElement('div');
             bubble.className = `p-4 rounded-2xl max-w-[90%] md:max-w-[85%] shadow-md border ${isUser ? 'bg-indigo-600 text-white border-indigo-500 rounded-tr-none' : 'bg-slate-800 text-slate-200 border-slate-700 rounded-tl-none prose prose-invert max-w-none'}`;
 
+            // 1. Image Attachment
             if(imageUrl) {
                 const img = document.createElement('img');
                 img.src = imageUrl;
                 img.className = "rounded-lg mb-2 max-h-48 max-w-full object-contain border border-white/10";
                 img.onerror = function() { this.style.display = 'none'; };
-                img.onload = function() { container.scrollTop = container.scrollHeight; };
+                img.onload = function() { scrollToBottom(); };
                 bubble.appendChild(img);
             }
 
+            // 2. Generic File Attachment (New)
+            if(attachment && attachment.type === 'file') {
+                const fileCard = document.createElement('div');
+                fileCard.className = "flex items-center gap-3 p-3 bg-white/10 rounded-lg border border-white/10 mb-2 max-w-full";
+                fileCard.innerHTML = `
+                    <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="file-text" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div class="flex flex-col overflow-hidden min-w-0">
+                        <span class="text-sm font-medium text-white truncate">${attachment.name || 'File'}</span>
+                        <span class="text-xs text-white/70">Attached File</span>
+                    </div>
+                `;
+                bubble.appendChild(fileCard);
+                // We need to re-run icon creation for dynamic elements
+                setTimeout(() => { if(typeof lucide !== 'undefined') lucide.createIcons(); }, 0);
+            }
+
+            // 3. Text Content
             if(content) {
                 const textDiv = document.createElement('div');
                 if(typeof marked !== 'undefined') {
                     try { 
-                        const rawHtml = marked.parse(content);
+                        const rawHtml = marked.parse ? marked.parse(content) : content;
                         const cleanHtml = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(rawHtml) : rawHtml;
                         textDiv.innerHTML = cleanHtml;
                         
-                        // Preview Generator Logic (Simplified for stability)
+                        // Preview Generator Logic (Same as before)
                         setTimeout(() => {
                             const codeBlocks = textDiv.querySelectorAll('pre code.language-html, pre code.language-xml');
                             codeBlocks.forEach(block => {
@@ -1021,7 +1374,7 @@
                         }, 50);
 
                     } catch(e) { 
-                        console.error(e);
+                        console.error("Markdown parsing error", e);
                         textDiv.innerText = content; 
                     }
                 } else {
@@ -1033,18 +1386,19 @@
             wrapper.appendChild(avatar);
             wrapper.appendChild(bubble);
             container.appendChild(wrapper);
-            container.scrollTop = container.scrollHeight;
+            scrollToBottom();
         }
 
-        function addMessage(content, isUser = false, imageUrl = null) {
-            chatHistory.push({content, isUser, imageUrl});
+        // UPDATED: Function to add message with support for generic files
+        function addMessage(content, isUser = false, imageUrl = null, attachment = null) {
+            chatHistory.push({content, isUser, imageUrl, attachment});
             try { localStorage.setItem('chat_history', JSON.stringify(chatHistory)); } catch(e){}
             
             if(isUser) {
                 const chips = document.getElementById('suggestion-chips');
                 if(chips) chips.classList.add('hidden');
             }
-            renderMessage(content, isUser, imageUrl);
+            renderMessage(content, isUser, imageUrl, attachment);
         }
 
         // --- Initialization ---
@@ -1085,22 +1439,33 @@
                 const input = document.getElementById('user-input');
                 const text = input.value.trim();
                 
-                // Capture file reference BEFORE clearing UI
                 const fileToSend = selectedFile; 
                 
                 if(!text && !fileToSend) return;
 
+                // PREPARE ATTACHMENT DATA FOR UI
                 let previewUrl = null;
+                let attachmentData = null;
+
                 if(fileToSend) {
-                    const prevImg = document.getElementById('image-preview');
-                    if(prevImg.src && prevImg.src.startsWith('data:')) previewUrl = prevImg.src;
+                    if(fileToSend.type.startsWith('image/')) {
+                        const prevImg = document.getElementById('image-preview-element');
+                        if(prevImg.src && prevImg.src.startsWith('data:')) {
+                            previewUrl = prevImg.src;
+                        }
+                    } else {
+                        // It's a non-image file
+                        attachmentData = { type: 'file', name: fileToSend.name };
+                    }
                 }
                 
-                addMessage(text, true, previewUrl);
+                // Add message to UI
+                addMessage(text, true, previewUrl, attachmentData);
                 
+                // Clear inputs
                 input.value = '';
                 input.style.height = '48px';
-                clearImage(); // Clear selection after sending
+                clearFileSelection(); 
                 input.focus();
                 
                 const sendBtn = document.getElementById('send-btn');
@@ -1111,7 +1476,7 @@
                 const loadingId = 'loading-' + Date.now();
                 const loadingHtml = `<div id="${loadingId}" class="flex gap-3"><div class="bot-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white">ต</div><div class="bg-slate-800 p-4 rounded-2xl rounded-tl-none border border-slate-700 flex gap-2 items-center"><div class="typing-dot w-2 h-2 bg-pink-500 rounded-full"></div><div class="typing-dot w-2 h-2 bg-purple-500 rounded-full"></div><div class="typing-dot w-2 h-2 bg-indigo-500 rounded-full"></div></div></div>`;
                 document.getElementById('messages').insertAdjacentHTML('beforeend', loadingHtml);
-                document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+                scrollToBottom();
 
                 try {
                     const formData = new FormData();
@@ -1123,12 +1488,11 @@
                         console.log("Sending file:", fileToSend.name);
                     }
 
-                    // CORS Proxy Handler
-                    const WEBHOOK_URL = 'https://corsproxy.io/?' + encodeURIComponent('https://laassx.app.n8n.cloud/webhook/20f1e0a0-71ed-4fa0-a696-373e4c4f84eb/chat');
+                    const TARGET_URL = 'https://laassx.app.n8n.cloud/webhook/20f1e0a0-71ed-4fa0-a696-373e4c4f84eb/chat';
                     
-                    const response = await fetch(WEBHOOK_URL, { method: 'POST', body: formData });
+                    const response = await fetch(TARGET_URL, { method: 'POST', body: formData });
                     
-                    if(!response.ok) throw new Error('Network response was not ok');
+                    if(!response.ok) throw new Error('Network response was not ok: ' + response.statusText);
                     
                     const data = await response.json();
                     let botResp = "Received empty response";
@@ -1141,8 +1505,8 @@
                     console.warn(err);
                     setTimeout(() => {
                         const errMsg = currentLang === 'en' 
-                            ? "🤖 [Simulation] Server (n8n) unreachable (CORS/Proxy Issue). I received your message: " + text + (fileToSend ? " [with Image]" : "")
-                            : "🤖 [โหมดจำลอง] เชื่อมต่อเซิร์ฟเวอร์ (n8n) ไม่ได้ หรือ Proxy มีปัญหา แต่ผมได้รับข้อความของคุณแล้ว: " + text + (fileToSend ? " [พร้อมรูปภาพ]" : "");
+                            ? "🤖 [Connection Error] I couldn't reach the n8n server. Please check if your n8n workflow is active and CORS is enabled." 
+                            : "🤖 [การเชื่อมต่อขัดข้อง] ผมติดต่อเซิร์ฟเวอร์ n8n โดยตรงไม่ได้ (กรุณาตรวจสอบว่า Workflow ใน n8n ทำงานอยู่ และเปิด CORS เป็น '*' แล้ว)";
                         addMessage(errMsg);
                     }, 1000);
                 } finally {
