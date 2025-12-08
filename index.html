@@ -17,17 +17,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class', // Enable class-based dark mode if needed
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        // Semantic colors mapped to CSS variables
                         background: ({ opacityValue }) => `rgba(var(--bg-rgb), ${opacityValue || 1})`,
                         surface: ({ opacityValue }) => `rgba(var(--surface-rgb), ${opacityValue || 1})`,
                         surface2: ({ opacityValue }) => `rgba(var(--surface2-rgb), ${opacityValue || 1})`,
                         border: ({ opacityValue }) => `rgba(var(--border-rgb), ${opacityValue || 1})`,
                         
-                        // Text colors
                         txt: {
                             main: ({ opacityValue }) => `rgba(var(--text-main-rgb), ${opacityValue || 1})`,
                             sec: ({ opacityValue }) => `rgba(var(--text-sec-rgb), ${opacityValue || 1})`,
@@ -72,10 +70,10 @@
 
         [data-theme="midnight"] {
             /* Midnight Theme - Pure Black/Zinc */
-            --bg-rgb: 0, 0, 0;           /* black */
-            --surface-rgb: 24, 24, 27;   /* zinc-900 */
-            --surface2-rgb: 39, 39, 42;  /* zinc-800 */
-            --border-rgb: 63, 63, 70;    /* zinc-700 */
+            --bg-rgb: 0, 0, 0;            /* black */
+            --surface-rgb: 24, 24, 27;    /* zinc-900 */
+            --surface2-rgb: 39, 39, 42;   /* zinc-800 */
+            --border-rgb: 63, 63, 70;     /* zinc-700 */
             --text-main-rgb: 244, 244, 245; /* zinc-100 */
             --text-sec-rgb: 212, 212, 216;  /* zinc-300 */
             --text-muted-rgb: 113, 113, 122; /* zinc-500 */
@@ -310,17 +308,15 @@
                 height: 100dvh !important;
                 border-radius: 0 !important;
                 border: none !important;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
+                /* position: fixed; REMOVED FIXED TO ALLOW SIDEBAR LAYOUT */
+                width: 100%;
                 z-index: 40;
                 background-color: rgb(var(--bg-rgb));
             }
             .mobile-hide { display: none !important; }
             main { padding: 0 !important; }
             body.in-chat nav { display: none; }
+            body.in-chat main { height: 100vh; overflow: hidden; }
         }
 
         /* Tabs Styles */
@@ -330,11 +326,28 @@
         .tab-btn.active {
             @apply bg-surface text-txt-main border-border shadow-lg shadow-pink-500/10;
         }
+
+        /* Session Item Styles */
+        .session-item {
+            @apply flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 border border-transparent;
+        }
+        .session-item:hover {
+            @apply bg-surface2/50;
+        }
+        .session-item.active-session {
+            @apply bg-surface2 border-pink-500/30 text-txt-main shadow-md;
+        }
+        .session-item .delete-btn {
+            @apply opacity-0 transition-opacity duration-200 p-1.5 rounded-lg hover:bg-red-500/20 hover:text-red-400 text-txt-muted;
+        }
+        .session-item:hover .delete-btn {
+            @apply opacity-100;
+        }
     </style>
 </head> 
 <body class="min-h-screen flex flex-col relative overflow-x-hidden">
 
-    <!-- New Cool Loader -->
+    <!-- Loader -->
     <div id="page-loader">
         <div class="loader-visual">
             <div class="loader-circle one"></div>
@@ -526,7 +539,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main id="main-container" class="flex-grow container mx-auto px-4 py-4 md:py-8 z-10 w-full">
+    <main id="main-container" class="flex-grow container mx-auto px-4 py-4 md:py-8 z-10 w-full h-full">
         
         <!-- HOME VIEW -->
         <div id="view-home" class="view-section flex-col items-center gap-8 md:gap-16 active">
@@ -535,7 +548,6 @@
                     ✨ Intelligent Multi-Agent Engine
                 </div>
                 <h1 class="text-4xl md:text-6xl font-bold leading-[1.6] md:leading-[1.6] py-4">
-                    <!-- Removed prefix span -->
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 inline-block text-glow-anim" data-i18n="brand_name">Ciel</span>
                 </h1>
                 <p class="text-xl text-txt-muted drop-shadow-md" data-i18n="hero_desc">
@@ -743,110 +755,106 @@
             <div class="mb-20"></div> 
         </div>
 
-        <!-- CHAT VIEW -->
-        <div id="view-chat" class="view-section flex-col items-center">
-            <section class="w-full max-w-6xl bg-surface/80 backdrop-blur-xl border-y border-border md:border md:rounded-3xl shadow-none md:shadow-2xl overflow-hidden flex flex-col h-[85vh] mobile-full-screen">
-                <div class="bg-surface p-3 md:p-4 flex items-center gap-4 border-b border-border z-10 shadow-md">
-                    <button onclick="navigateTo('home')" class="md:hidden text-txt-muted hover:text-txt-main mr-1 p-1 rounded-full hover:bg-surface2">
-                        <i data-lucide="arrow-left" class="w-5 h-5"></i>
-                    </button>
-                    <div class="relative group cursor-pointer flex-shrink-0" onclick="document.getElementById('avatar-upload').click()" title="Click to change avatar">
-                        <div id="header-avatar" class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex items-center justify-center text-lg font-bold text-white shadow-lg overflow-hidden border border-border">
-                            ต
-                        </div>
-                        <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <i data-lucide="camera" class="w-4 h-4 text-white"></i>
-                        </div>
-                        <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-surface"></div>
-                    </div>
-                    <div class="flex-grow min-w-0">
-                        <h3 class="font-bold text-base md:text-lg truncate" data-i18n="brand_name">Ciel</h3>
-                        <p class="text-xs text-txt-muted flex items-center gap-1">
-                            <i id="status-icon" data-lucide="zap" class="w-3 h-3 text-yellow-400"></i> <span id="bot-status-text" data-i18n="online_ready">Active</span>
-                        </p>
-                    </div>
-                    
-                    <button onclick="triggerClearChat()" class="p-2 text-red-400 hover:text-red-300 hover:bg-surface2/50 rounded-full transition flex items-center justify-center" title="Clear Chat">
-                        <i data-lucide="trash-2" class="w-5 h-5"></i>
-                    </button>
-                </div>
-
-                <div id="messages" class="flex-1 p-4 md:p-6 overflow-y-auto chat-container space-y-4 bg-background/50 pb-20 md:pb-6">
-                    
-                    <div class="flex gap-3">
-                        <div class="bot-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden">ต</div>
-                        <div class="bg-surface text-txt-main p-4 rounded-2xl rounded-tl-none max-w-[85%] border border-border shadow-md">
-                            <p data-i18n="welcome_msg">Hello! I'm Ciel. 👋</p>
-                        </div>
-                    </div>
-
-                    <div id="suggestion-chips" class="flex md:flex-wrap gap-2 py-2 px-2 justify-start md:justify-start ml-0 md:ml-11 chips-container">
-                        <button onclick="fillPrompt('Analyze this document and extract key insights')" class="px-3 py-1.5 bg-surface border border-border rounded-full text-xs text-txt-sec hover:bg-pink-600 hover:text-white hover:border-pink-500 transition shadow-sm flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
-                            <span>🔍</span> Analyze PDF
-                        </button>
-                        <button onclick="fillPrompt('Create a technical guide for...')" class="px-3 py-1.5 bg-surface border border-border rounded-full text-xs text-txt-sec hover:bg-violet-600 hover:text-white hover:border-violet-500 transition shadow-sm flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
-                            <span>📘</span> Generate Technical Guide
-                        </button>
-                        <button onclick="fillPrompt('Write a Python script to...')" class="px-3 py-1.5 bg-surface border border-border rounded-full text-xs text-txt-sec hover:bg-blue-600 hover:text-white hover:border-blue-500 transition shadow-sm flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
-                            <span>💻</span> Write Python Code
-                        </button>
-                        <button onclick="fillPrompt('Visualize this concept as an image...')" class="px-3 py-1.5 bg-surface border border-border rounded-full text-xs text-txt-sec hover:bg-emerald-600 hover:text-white hover:border-emerald-500 transition shadow-sm flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
-                            <span>🎨</span> Create Visual Concept
+        <!-- CHAT VIEW (UPDATED LAYOUT) -->
+        <div id="view-chat" class="view-section flex-col items-center h-screen md:pt-4 pb-4 px-2 md:px-4">
+            <div class="w-full max-w-7xl flex gap-4 h-full relative">
+                
+                <!-- Sidebar (History) -->
+                <aside id="chat-sidebar" class="hidden md:flex flex-col w-64 bg-surface/80 backdrop-blur-xl border border-border rounded-3xl shadow-xl overflow-hidden transition-all absolute md:static inset-y-0 left-0 z-30 transform -translate-x-full md:translate-x-0 h-full">
+                    <div class="p-4 border-b border-border flex justify-between items-center bg-surface2/30">
+                        <h3 class="font-bold text-txt-main flex items-center gap-2">
+                            <i data-lucide="history" class="w-4 h-4 text-pink-500"></i> History
+                        </h3>
+                        <button onclick="createNewSession()" class="p-2 hover:bg-surface2 rounded-full text-txt-main transition shadow-sm border border-border/50" title="New Chat">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
                         </button>
                     </div>
-                </div>
-
-                <!-- Enhanced File Preview Container -->
-                <div id="file-preview-container" class="hidden px-4 pt-2 bg-surface/50 border-t border-border">
-                    <div class="relative inline-flex items-center gap-3 p-2 bg-surface2/50 rounded-xl border border-border/50">
-                        <!-- Image Preview -->
-                        <img id="image-preview-element" alt="Preview" class="hidden h-14 w-auto rounded-lg object-contain border border-border">
-                        
-                        <!-- File Icon Preview -->
-                        <div id="file-preview-icon" class="hidden w-10 h-10 bg-surface2 rounded-lg flex items-center justify-center text-txt-sec">
-                            <i data-lucide="file-text" class="w-6 h-6"></i>
-                        </div>
-
-                        <!-- File Info -->
-                        <div class="flex flex-col">
-                            <span id="preview-filename" class="text-xs text-txt-main font-medium max-w-[150px] truncate"></span>
-                            <span id="preview-filesize" class="text-[10px] text-txt-muted"></span>
-                        </div>
-
-                        <!-- Clear Button -->
-                        <button id="clear-file-btn" onclick="clearFileSelection(true)" class="ml-2 p-1 bg-surface2 hover:bg-red-500/80 text-white rounded-full transition shadow-sm">
-                            <i data-lucide="x" class="w-3 h-3"></i>
-                        </button>
+                    <div id="session-list" class="flex-1 overflow-y-auto p-2 space-y-2 chat-container">
+                        <!-- Items will be injected here -->
                     </div>
-                </div>
+                </aside>
 
-                <div class="p-3 md:p-4 bg-surface border-t border-border z-10 shadow-[0_-5px_15px_rgba(0,0,0,0.3)]">
-                    <form id="chat-form" class="flex gap-2 items-end">
-                        <!-- File Input (Removed Accept restriction) -->
-                        <input type="file" id="file-input" class="hidden" onchange="handleFileSelect(event)">
-                        
-                        <!-- Changed Icon to Paperclip -->
-                        <button type="button" onclick="document.getElementById('file-input').click()" class="p-3 text-txt-muted hover:text-pink-400 hover:bg-surface2 rounded-xl transition flex-shrink-0" title="Upload File">
-                            <i data-lucide="paperclip" class="w-6 h-6"></i>
+                <!-- Overlay for Mobile Sidebar -->
+                <div id="sidebar-overlay" onclick="toggleChatSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden glass"></div>
+
+                <!-- Main Chat Area -->
+                <section class="flex-1 bg-surface/80 backdrop-blur-xl border border-border rounded-3xl shadow-xl overflow-hidden flex flex-col relative h-full">
+                    <div class="bg-surface p-3 md:p-4 flex items-center gap-4 border-b border-border z-10 shadow-md">
+                        <!-- Back button (Mobile view logic) -->
+                        <button onclick="navigateTo('home')" class="md:hidden text-txt-muted hover:text-txt-main mr-1 p-1 rounded-full hover:bg-surface2">
+                            <i data-lucide="arrow-left" class="w-5 h-5"></i>
                         </button>
                         
-                        <div class="flex-grow relative">
-                            <textarea 
-                                id="user-input" 
-                                rows="1"
-                                placeholder="Message Ciel..." 
-                                class="w-full bg-background text-txt-main border-0 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 resize-none outline-none placeholder-txt-muted"
-                                style="min-height: 48px; max-height: 120px;"
-                                onkeydown="handleEnter(event)"
-                            ></textarea>
-                        </div>
-
-                        <button type="submit" id="send-btn" class="p-3 bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white rounded-xl shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0">
-                            <i data-lucide="send-horizontal" class="w-6 h-6"></i>
+                        <!-- Toggle Sidebar Button (Mobile) -->
+                        <button onclick="toggleChatSidebar()" class="md:hidden text-txt-main p-2 hover:bg-surface2 rounded-full">
+                            <i data-lucide="panel-left" class="w-5 h-5"></i>
                         </button>
-                    </form>
-                </div>
-            </section>
+
+                        <div class="relative group cursor-pointer flex-shrink-0" onclick="document.getElementById('avatar-upload').click()" title="Click to change avatar">
+                            <div id="header-avatar" class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex items-center justify-center text-lg font-bold text-white shadow-lg overflow-hidden border border-border">
+                                ต
+                            </div>
+                            <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i data-lucide="camera" class="w-4 h-4 text-white"></i>
+                            </div>
+                            <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-surface"></div>
+                        </div>
+                        <div class="flex-grow min-w-0">
+                            <h3 class="font-bold text-base md:text-lg truncate" data-i18n="brand_name">Ciel</h3>
+                            <p class="text-xs text-txt-muted flex items-center gap-1">
+                                <i id="status-icon" data-lucide="zap" class="w-3 h-3 text-yellow-400"></i> <span id="bot-status-text" data-i18n="online_ready">Active</span>
+                            </p>
+                        </div>
+                        
+                        <button onclick="triggerClearChat()" class="p-2 text-red-400 hover:text-red-300 hover:bg-surface2/50 rounded-full transition flex items-center justify-center" title="Clear Chat">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+
+                    <div id="messages" class="flex-1 p-4 md:p-6 overflow-y-auto chat-container space-y-4 bg-background/50 pb-20 md:pb-6">
+                        <!-- Messages go here -->
+                    </div>
+
+                    <!-- Enhanced File Preview Container -->
+                    <div id="file-preview-container" class="hidden px-4 pt-2 bg-surface/50 border-t border-border">
+                        <div class="relative inline-flex items-center gap-3 p-2 bg-surface2/50 rounded-xl border border-border/50">
+                            <img id="image-preview-element" alt="Preview" class="hidden h-14 w-auto rounded-lg object-contain border border-border">
+                            <div id="file-preview-icon" class="hidden w-10 h-10 bg-surface2 rounded-lg flex items-center justify-center text-txt-sec">
+                                <i data-lucide="file-text" class="w-6 h-6"></i>
+                            </div>
+                            <div class="flex flex-col">
+                                <span id="preview-filename" class="text-xs text-txt-main font-medium max-w-[150px] truncate"></span>
+                                <span id="preview-filesize" class="text-[10px] text-txt-muted"></span>
+                            </div>
+                            <button id="clear-file-btn" onclick="clearFileSelection(true)" class="ml-2 p-1 bg-surface2 hover:bg-red-500/80 text-white rounded-full transition shadow-sm">
+                                <i data-lucide="x" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="p-3 md:p-4 bg-surface border-t border-border z-10 shadow-[0_-5px_15px_rgba(0,0,0,0.3)]">
+                        <form id="chat-form" class="flex gap-2 items-end">
+                            <input type="file" id="file-input" class="hidden" onchange="handleFileSelect(event)">
+                            <button type="button" onclick="document.getElementById('file-input').click()" class="p-3 text-txt-muted hover:text-pink-400 hover:bg-surface2 rounded-xl transition flex-shrink-0" title="Upload File">
+                                <i data-lucide="paperclip" class="w-6 h-6"></i>
+                            </button>
+                            <div class="flex-grow relative">
+                                <textarea 
+                                    id="user-input" 
+                                    rows="1"
+                                    placeholder="Message Ciel..." 
+                                    class="w-full bg-background text-txt-main border-0 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 resize-none outline-none placeholder-txt-muted"
+                                    style="min-height: 48px; max-height: 120px;"
+                                    onkeydown="handleEnter(event)"
+                                ></textarea>
+                            </div>
+                            <button type="submit" id="send-btn" class="p-3 bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white rounded-xl shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0">
+                                <i data-lucide="send-horizontal" class="w-6 h-6"></i>
+                            </button>
+                        </form>
+                    </div>
+                </section>
+            </div>
         </div>
 
     </main>
@@ -859,12 +867,9 @@
         // --- Global Variables ---
         let currentLang = localStorage.getItem('app_language') || 'th';
         let currentTheme = localStorage.getItem('app_theme') || 'default';
-        let sessionId = localStorage.getItem('chat_session_id');
-        if (!sessionId) {
-            sessionId = crypto.randomUUID();
-            localStorage.setItem('chat_session_id', sessionId);
-        }
+        let sessionId = localStorage.getItem('active_session_id'); // Changed from chat_session_id
         let chatHistory = [];
+        let sessions = []; // List of all sessions
         let currentUser = null;
         let selectedFile = null;
         let botAvatarUrl = localStorage.getItem('bot_avatar');
@@ -880,10 +885,10 @@
             en: {
                 home: "Home", about: "About", ai_friend: "Ciel", chat_now: "Launch Ciel",
                 meet_companion: "✨ Intelligent Multi-Agent Engine", hero_title_prefix: "",
-                hero_desc: "Your intelligent AI partner that turns complexity into simplicity. Analyze deep data, write code, and create instantly.",
+                hero_desc: "Developing a precise information retrieval assistant web app bot.",
                 brand_nav: "Ciel", brand_name: "Ciel", online_ready: "System Active",
                 welcome_msg: "Hello! I'm Ciel. 👋",
-                welcome_sub: "",
+                welcome_sub: "I'm your Multi-Agent Orchestration Engine. Upload a PDF to start researching, or ask me to generate code.",
                 placeholder_input: "Message Ciel...", powered_by: "Powered by n8n Webhook",
                 footer: "© 2024 Ciel. All rights reserved.",
                 error_msg: "⚠️ System Alert: Connection to Orchestrator failed. Please retry.",
@@ -919,7 +924,7 @@
                 hero_desc: "ผู้ช่วย AI อัจฉริยะที่เปลี่ยนเรื่องยากให้เป็นเรื่องง่าย ช่วยคุณวิเคราะห์ข้อมูลเชิงลึก เขียนโค้ด และสร้างสรรค์ผลงานได้ในพริบตา",
                 brand_nav: "Ciel", brand_name: "Ciel", online_ready: "ระบบพร้อมใช้งาน",
                 welcome_msg: "สวัสดีครับ! ผมคือ Ciel 👋",
-                welcome_sub: "",
+                welcome_sub: "ผมคือระบบ Multi-Agent Orchestration อัปโหลดไฟล์ PDF เพื่อเริ่มการวิจัย หรือสั่งให้ผมเขียนโค้ดได้เลยครับ",
                 placeholder_input: "สั่งงาน Ciel...", powered_by: "ขับเคลื่อนโดย n8n Webhook",
                 footer: "© 2024 Ciel. สงวนลิขสิทธิ์",
                 error_msg: "⚠️ แจ้งเตือน: การเชื่อมต่อกับระบบหลักล้มเหลว กรุณาลองใหม่อีกครั้ง",
@@ -968,21 +973,18 @@
             currentLang = currentLang === 'en' ? 'th' : 'en';
             localStorage.setItem('app_language', currentLang);
             updateContent();
-            updateChatWelcomeMessage(); // Refresh welcome message text
+            updateChatWelcomeMessage(); 
         };
 
-        // --- Theme Logic ---
         window.applyTheme = function(theme) {
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('app_theme', theme);
         };
 
         window.toggleTheme = function() {
-            // Cycle through themes: default -> light -> midnight -> default
             if (currentTheme === 'default') currentTheme = 'light';
             else if (currentTheme === 'light') currentTheme = 'midnight';
             else currentTheme = 'default';
-            
             applyTheme(currentTheme);
         };
 
@@ -993,13 +995,10 @@
              if(welcomeSub) welcomeSub.innerText = translations[currentLang].welcome_sub;
         }
 
-        // New Tab Switcher Function
         window.switchTab = function(tabName) {
-            // Update Buttons
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('tab-' + tabName).classList.add('active');
             
-            // Update Content
             document.getElementById('content-usage').classList.add('hidden');
             document.getElementById('content-github').classList.add('hidden');
             document.getElementById('content-project').classList.add('hidden');
@@ -1013,7 +1012,6 @@
             });
             const selected = document.getElementById('view-' + viewId);
             selected.style.display = 'flex';
-            // Small delay to allow display:flex to apply before adding opacity
             setTimeout(() => selected.classList.add('active'), 10);
             
             document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('nav-btn-active'));
@@ -1021,15 +1019,147 @@
             if(activeBtn) activeBtn.classList.add('nav-btn-active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            // Mobile specific Logic for cleaner UI
             if (viewId === 'chat') {
                 document.body.classList.add('in-chat');
                 scrollToBottom();
+                renderSessionList(); // Refresh session list when entering chat
             } else {
                 document.body.classList.remove('in-chat');
             }
         };
 
+        // --- Sidebar Logic ---
+        window.toggleChatSidebar = function() {
+            const sidebar = document.getElementById('chat-sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                // On mobile, sidebar should be absolute
+                if(window.innerWidth < 768) sidebar.classList.add('absolute');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        };
+
+        // --- Session Management ---
+        function loadSessions() {
+            try {
+                // Migration: If legacy chat_history exists but no sessions, create one
+                const legacyHistory = localStorage.getItem('chat_history');
+                const storedSessions = localStorage.getItem('ciel_sessions');
+                
+                if (legacyHistory && !storedSessions) {
+                    const newId = crypto.randomUUID();
+                    const newSession = {
+                        id: newId,
+                        title: 'Legacy Chat',
+                        timestamp: Date.now()
+                    };
+                    sessions = [newSession];
+                    localStorage.setItem('ciel_sessions', JSON.stringify(sessions));
+                    localStorage.setItem(`ciel_chat_${newId}`, legacyHistory);
+                    localStorage.removeItem('chat_history');
+                    sessionId = newId;
+                } else if (storedSessions) {
+                    sessions = JSON.parse(storedSessions);
+                }
+                
+                if (!sessionId && sessions.length > 0) {
+                    sessionId = sessions[0].id;
+                }
+                
+                if (!sessionId && sessions.length === 0) {
+                    createNewSession(false); // Create default if nothing exists
+                }
+
+                localStorage.setItem('active_session_id', sessionId);
+
+            } catch(e) { console.error("Session load error", e); }
+        }
+
+        window.createNewSession = function(render = true) {
+            const newId = crypto.randomUUID();
+            const newSession = {
+                id: newId,
+                title: 'New Chat',
+                timestamp: Date.now()
+            };
+            sessions.unshift(newSession); // Add to top
+            sessionId = newId;
+            localStorage.setItem('ciel_sessions', JSON.stringify(sessions));
+            localStorage.setItem('active_session_id', sessionId);
+            
+            chatHistory = []; // Empty history for new session
+            
+            if(render) {
+                renderSessionList();
+                renderChatHistory(); // Clear chat view
+                if(window.innerWidth < 768) toggleChatSidebar(); // Close sidebar on mobile
+            }
+        };
+
+        window.switchSession = function(id) {
+            sessionId = id;
+            localStorage.setItem('active_session_id', id);
+            renderSessionList(); // Update active state
+            loadChatHistory(); // Load messages for this ID
+            renderChatHistory(); // Render them
+            if(window.innerWidth < 768) toggleChatSidebar();
+        };
+
+        window.deleteSession = function(e, id) {
+            e.stopPropagation(); // Prevent clicking the item
+            
+            showConfirmModal(
+                currentLang === 'en' ? 'Delete Chat?' : 'ลบแชท?',
+                currentLang === 'en' ? 'Remove this conversation permanently?' : 'ต้องการลบบทสนทนานี้ใช่ไหม?',
+                () => {
+                    sessions = sessions.filter(s => s.id !== id);
+                    localStorage.setItem('ciel_sessions', JSON.stringify(sessions));
+                    localStorage.removeItem(`ciel_chat_${id}`); // Remove message data
+                    
+                    // If deleted active session, switch to another or create new
+                    if (sessionId === id) {
+                        if (sessions.length > 0) {
+                            switchSession(sessions[0].id);
+                        } else {
+                            createNewSession();
+                        }
+                    } else {
+                        renderSessionList();
+                    }
+                }
+            );
+        };
+
+        function renderSessionList() {
+            const container = document.getElementById('session-list');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            sessions.forEach(session => {
+                const div = document.createElement('div');
+                div.className = `session-item group ${session.id === sessionId ? 'active-session' : 'text-txt-sec'}`;
+                div.onclick = () => switchSession(session.id);
+                
+                div.innerHTML = `
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <i data-lucide="message-square" class="w-4 h-4 flex-shrink-0 ${session.id === sessionId ? 'text-pink-500' : 'text-txt-muted'}"></i>
+                        <span class="truncate text-sm font-medium">${session.title}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteSession(event, '${session.id}')">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // --- Standard UI Logic ---
         window.toggleMobileMenu = function() {
             const menu = document.getElementById('mobile-menu');
             const icon = document.getElementById('mobile-menu-icon');
@@ -1061,7 +1191,6 @@
             else { signup.classList.add('hidden'); login.classList.remove('hidden'); }
         };
 
-        // --- AUTH Logic (Mock & Manual) ---
         window.handleLogin = function(e) {
             if(e) e.preventDefault();
             const emailIn = document.getElementById('login-email').value;
@@ -1070,36 +1199,6 @@
             localStorage.setItem('user_profile', JSON.stringify(currentUser));
             updateAuthUI();
             closeAuthModal();
-        };
-
-        // Mock Google Login for Demo Purposes
-        window.handleGoogleLogin = function() {
-            const googleBtn = document.querySelector('button[onclick="handleGoogleLogin()"]');
-            const originalContent = googleBtn.innerHTML;
-            googleBtn.innerHTML = `
-                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-slate-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>Signing in...</span>
-            `;
-            
-            setTimeout(() => {
-                const mockResponse = {
-                    name: "Demo User",
-                    email: "demo@gmail.com",
-                    picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
-                };
-                currentUser = { 
-                    name: mockResponse.name, 
-                    email: mockResponse.email,
-                    avatar: mockResponse.picture 
-                };
-                localStorage.setItem('user_profile', JSON.stringify(currentUser));
-                updateAuthUI();
-                closeAuthModal();
-                googleBtn.innerHTML = originalContent;
-            }, 1500);
         };
 
         window.handleSignup = function(e) { 
@@ -1154,15 +1253,14 @@
             }
         }
 
-        // --- Modals ---
         window.triggerClearChat = function() {
             showConfirmModal(
                 currentLang === 'en' ? 'Clear History?' : 'ล้างประวัติแชท?',
-                currentLang === 'en' ? 'Delete all messages?' : 'ต้องการลบข้อความทั้งหมดใช่ไหม?',
+                currentLang === 'en' ? 'Delete messages in this chat?' : 'ต้องการลบข้อความในแชทนี้ใช่ไหม?',
                 () => {
-                    localStorage.removeItem('chat_history');
                     chatHistory = [];
-                    window.location.reload();
+                    saveCurrentChat();
+                    renderChatHistory();
                 }
             );
         };
@@ -1190,7 +1288,6 @@
             confirmAction = null; 
         };
 
-        // --- Chat & File Logic ---
         window.fillPrompt = function(text) {
             const input = document.getElementById('user-input');
             input.value = text;
@@ -1198,17 +1295,14 @@
             input.focus();
         };
         
-        // UPDATED: clearFileSelection to replace clearImage with loading spinner support
         window.clearFileSelection = function(isManual = false) {
             if (isManual) {
                 const btn = document.getElementById('clear-file-btn');
                 const originalContent = btn.innerHTML;
                 
-                // Show loader
                 btn.innerHTML = '<div class="animate-spin w-3 h-3 border-2 border-white border-t-transparent rounded-full"></div>';
                 btn.disabled = true;
                 
-                // UX Delay
                 setTimeout(() => {
                     performClear();
                     btn.innerHTML = originalContent;
@@ -1226,15 +1320,12 @@
             document.getElementById('file-preview-container').classList.add('hidden');
             
             const img = document.getElementById('image-preview-element');
-            
-            // Fix for broken image icon showing on some browsers
-            img.style.display = 'none'; // Force hide using inline style
+            img.style.display = 'none'; 
             img.src = ''; 
             
             document.getElementById('file-preview-icon').classList.add('hidden');
         }
         
-        // UPDATED: Handle any file type
         window.handleFileSelect = function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1250,20 +1341,18 @@
             sizePrev.textContent = (file.size / 1024).toFixed(1) + ' KB';
             container.classList.remove('hidden');
 
-            // If it's an image, show preview
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                     imgPrev.src = ev.target.result;
                     imgPrev.classList.remove('hidden');
-                    imgPrev.style.display = 'block'; // Force show
+                    imgPrev.style.display = 'block'; 
                     iconPrev.classList.add('hidden');
                 };
                 reader.readAsDataURL(file);
             } else {
-                // Not an image, show generic icon
                 imgPrev.src = '';
-                imgPrev.style.display = 'none'; // Force hide
+                imgPrev.style.display = 'none'; 
                 imgPrev.classList.add('hidden');
                 iconPrev.classList.remove('hidden');
             }
@@ -1289,7 +1378,7 @@
             }
         };
 
-        // --- Chat Rendering ---
+        // --- Chat Rendering & Logic ---
         function scrollToBottom() {
              const container = document.getElementById('messages');
              setTimeout(() => {
@@ -1299,33 +1388,49 @@
 
         function loadChatHistory() {
             try {
-                const stored = localStorage.getItem('chat_history');
+                // Load specific session history
+                const stored = localStorage.getItem(`ciel_chat_${sessionId}`);
                 if (stored) chatHistory = JSON.parse(stored);
-            } catch(e) { localStorage.removeItem('chat_history'); }
-            
-            const container = document.getElementById('messages');
-            
-            if (chatHistory.length > 0) {
-                container.innerHTML = ''; 
-                // Restore Welcome Message
-                const welcomeHtml = `
-                    <div class="flex gap-3">
-                        <div class="bot-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden">ต</div>
-                        <div class="bg-surface text-txt-main p-4 rounded-2xl rounded-tl-none max-w-[85%] border border-border shadow-md">
-                            <p data-i18n="welcome_msg">${translations[currentLang].welcome_msg}</p>
-                        </div>
-                    </div>
-                `;
-                container.insertAdjacentHTML('afterbegin', welcomeHtml);
+                else chatHistory = [];
+            } catch(e) { chatHistory = []; }
+        }
 
-                // UPDATED: Load message with attachment info if available
-                chatHistory.forEach(msg => renderMessage(msg.content, msg.isUser, msg.imageUrl, msg.attachment));
-                
-                const chips = document.getElementById('suggestion-chips');
-                if(chips) chips.classList.add('hidden');
-                
-                scrollToBottom();
+        function saveCurrentChat() {
+            try {
+                localStorage.setItem(`ciel_chat_${sessionId}`, JSON.stringify(chatHistory));
+            } catch(e) {}
+        }
+
+        function renderChatHistory() {
+            const container = document.getElementById('messages');
+            container.innerHTML = ''; 
+            
+            // Welcome Message
+            const welcomeHtml = `
+                <div class="flex gap-3">
+                    <div class="bot-avatar w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-violet-600 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden">ต</div>
+                    <div class="bg-surface text-txt-main p-4 rounded-2xl rounded-tl-none max-w-[85%] border border-border shadow-md">
+                        <p data-i18n="welcome_msg">${translations[currentLang].welcome_msg}</p>
+                        <p class="mt-2 text-txt-sec text-sm" data-i18n="welcome_sub">${translations[currentLang].welcome_sub}</p>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('afterbegin', welcomeHtml);
+
+            // Suggestion Chips (Only show if history is empty)
+            if(chatHistory.length === 0) {
+                 const chipsHtml = `
+                    <div id="suggestion-chips" class="flex md:flex-wrap gap-2 py-2 px-2 justify-start md:justify-start ml-0 md:ml-11 chips-container">
+                        <button onclick="fillPrompt('ช่วยเขียนโค้ด Python สำหรับ...')" class="px-3 py-1.5 bg-surface border border-border rounded-full text-xs text-txt-sec hover:bg-blue-600 hover:text-white hover:border-blue-500 transition shadow-sm flex items-center gap-1 flex-shrink-0 whitespace-nowrap"><span>💻</span> เขียนโค้ด</button>
+                        <button onclick="fillPrompt('ช่วยวิเคราะห์ข้อมูลจาก...')" class="px-3 py-1.5 bg-surface border border-border rounded-full text-xs text-txt-sec hover:bg-pink-600 hover:text-white hover:border-pink-500 transition shadow-sm flex items-center gap-1 flex-shrink-0 whitespace-nowrap"><span>📊</span> วิเคราะห์ข้อมูล</button>
+                        <button onclick="fillPrompt('ช่วยคำนวณ...')" class="px-3 py-1.5 bg-surface border border-border rounded-full text-xs text-txt-sec hover:bg-violet-600 hover:text-white hover:border-violet-500 transition shadow-sm flex items-center gap-1 flex-shrink-0 whitespace-nowrap"><span>🧮</span> คำนวณ</button>
+                        <button onclick="fillPrompt('ขอสอบถามเกี่ยวกับ...')" class="px-3 py-1.5 bg-surface border border-border rounded-full text-xs text-txt-sec hover:bg-emerald-600 hover:text-white hover:border-emerald-500 transition shadow-sm flex items-center gap-1 flex-shrink-0 whitespace-nowrap"><span>💬</span> สอบถามเรื่องทั่วไป</button>
+                    </div>`;
+                 container.insertAdjacentHTML('beforeend', chipsHtml);
             }
+
+            chatHistory.forEach(msg => renderMessage(msg.content, msg.isUser, msg.imageUrl, msg.attachment));
+            scrollToBottom();
         }
 
         function loadAvatar() {
@@ -1347,14 +1452,21 @@
                 const button = document.createElement('button');
                 button.className = 'copy-btn absolute top-2 right-2 text-txt-muted hover:text-white bg-surface2/50 hover:bg-surface2 rounded p-1.5 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100';
                 button.innerHTML = '<i data-lucide="copy" class="w-4 h-4"></i>';
-                button.title = 'Copy code';
                 
                 button.addEventListener('click', async (e) => {
                     e.stopPropagation();
                     const code = pre.querySelector('code');
                     const text = code ? code.innerText : pre.innerText;
+                    
                     try {
-                        await navigator.clipboard.writeText(text);
+                        // Create a temporary textarea for copying to ensure compatibility
+                        const textArea = document.createElement("textarea");
+                        textArea.value = text;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        
                         button.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-green-400"></i>';
                         setTimeout(() => { 
                             button.innerHTML = '<i data-lucide="copy" class="w-4 h-4"></i>'; 
@@ -1367,13 +1479,11 @@
             });
         }
 
-        // UPDATED: Render Message to support File Attachments
         function renderMessage(content, isUser, imageUrl, attachment) {
             const container = document.getElementById('messages');
             const wrapper = document.createElement('div');
             wrapper.className = `flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`;
             
-            // Avatar
             const avatar = document.createElement('div');
             avatar.className = `w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white overflow-hidden ${isUser ? 'bg-surface2 text-txt-sec' : 'bg-gradient-to-tr from-pink-500 to-violet-600 bot-avatar'}`;
             if(isUser) {
@@ -1385,11 +1495,9 @@
                 else avatar.innerText = 'ต';
             }
 
-            // Bubble
             const bubble = document.createElement('div');
             bubble.className = `p-4 rounded-2xl max-w-[90%] md:max-w-[85%] shadow-md border ${isUser ? 'bg-indigo-600 text-white border-indigo-500 rounded-tr-none' : 'bg-surface text-txt-main border-border rounded-tl-none prose prose-invert max-w-none'}`;
 
-            // 1. Image Attachment
             if(imageUrl) {
                 const img = document.createElement('img');
                 img.src = imageUrl;
@@ -1399,7 +1507,6 @@
                 bubble.appendChild(img);
             }
 
-            // 2. Generic File Attachment (New)
             if(attachment && attachment.type === 'file') {
                 const fileCard = document.createElement('div');
                 fileCard.className = "flex items-center gap-3 p-3 bg-surface2/50 rounded-lg border border-border/50 mb-2 max-w-full";
@@ -1413,11 +1520,9 @@
                     </div>
                 `;
                 bubble.appendChild(fileCard);
-                // We need to re-run icon creation for dynamic elements
                 setTimeout(() => { if(typeof lucide !== 'undefined') lucide.createIcons(); }, 0);
             }
 
-            // 3. Text Content
             if(content) {
                 const textDiv = document.createElement('div');
                 if(typeof marked !== 'undefined') {
@@ -1426,7 +1531,6 @@
                         const cleanHtml = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(rawHtml) : rawHtml;
                         textDiv.innerHTML = cleanHtml;
                         
-                        // Preview Generator Logic (Same as before)
                         setTimeout(() => {
                             const codeBlocks = textDiv.querySelectorAll('pre code.language-html, pre code.language-xml');
                             codeBlocks.forEach(block => {
@@ -1459,7 +1563,6 @@
                         }, 50);
 
                     } catch(e) { 
-                        console.error("Markdown parsing error", e);
                         textDiv.innerText = content; 
                     }
                 } else {
@@ -1474,21 +1577,30 @@
             scrollToBottom();
         }
 
-        // UPDATED: Function to add message with support for generic files
+        // UPDATED: addMessage stores state
         function addMessage(content, isUser = false, imageUrl = null, attachment = null) {
             chatHistory.push({content, isUser, imageUrl, attachment});
-            try { localStorage.setItem('chat_history', JSON.stringify(chatHistory)); } catch(e){}
+            saveCurrentChat();
             
             if(isUser) {
                 const chips = document.getElementById('suggestion-chips');
                 if(chips) chips.classList.add('hidden');
+                
+                // Update session title if it's "New Chat" and this is first user message
+                const session = sessions.find(s => s.id === sessionId);
+                if (session && session.title === 'New Chat') {
+                    // Truncate to ~20 chars
+                    session.title = content.substring(0, 20) + (content.length > 20 ? '...' : '');
+                    localStorage.setItem('ciel_sessions', JSON.stringify(sessions));
+                    renderSessionList();
+                }
             }
             renderMessage(content, isUser, imageUrl, attachment);
         }
 
         // --- Initialization ---
         window.addEventListener('DOMContentLoaded', () => {
-            applyTheme(currentTheme); // Apply theme on load
+            applyTheme(currentTheme); 
             const loader = document.getElementById('page-loader');
             if(loader) {
                 setTimeout(() => {
@@ -1501,7 +1613,14 @@
             updateContent();
             updateAuthUI();
             loadAvatar();
+            
+            // LOAD SESSIONS FIRST
+            loadSessions();
+            renderSessionList();
+            
+            // LOAD CURRENT SESSION HISTORY
             loadChatHistory();
+            
             navigateTo('home');
 
             const userInput = document.getElementById('user-input');
@@ -1529,7 +1648,6 @@
                 
                 if(!text && !fileToSend) return;
 
-                // PREPARE ATTACHMENT DATA FOR UI
                 let previewUrl = null;
                 let attachmentData = null;
 
@@ -1540,15 +1658,12 @@
                             previewUrl = prevImg.src;
                         }
                     } else {
-                        // It's a non-image file
                         attachmentData = { type: 'file', name: fileToSend.name };
                     }
                 }
                 
-                // Add message to UI
                 addMessage(text, true, previewUrl, attachmentData);
                 
-                // Clear inputs
                 input.value = '';
                 input.style.height = '48px';
                 clearFileSelection(); 
@@ -1571,7 +1686,6 @@
                     
                     if(fileToSend) {
                         formData.append('file', fileToSend);
-                        console.log("Sending file:", fileToSend.name);
                     }
 
                     const TARGET_URL = 'https://laassx.app.n8n.cloud/webhook/20f1e0a0-71ed-4fa0-a696-373e4c4f84eb/chat';
