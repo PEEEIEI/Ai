@@ -934,13 +934,13 @@
                 signup_title: "สร้างบัญชีใหม่", signup_subtitle: "เข้าร่วมเครือข่าย", btn_signup: "สมัครสมาชิก",
                 
                 // Ciel Logic Guide (TH)
-                guide_step1_title: "Research Agent", guide_step1_desc: "วิเคราะห์ข้อมูลจาก PDF และตรวจสอบความถูกต้องผ่าน OpenRouter และ Wikipedia",
-                guide_step2_title: "Technical Synthesis", guide_step2_desc: "ทำหน้าที่เป็นผู้สอนอัจฉริยะ สร้างโค้ด (Python/JS) และคู่มือการเรียนรู้ทีละขั้นตอน",
-                guide_step3_title: "Creative Agent", guide_step3_desc: "สังเคราะห์ข้อมูลเป็นเรื่องราวที่น่าสนใจ และสร้าง Prompt สำหรับสร้างรูปภาพด้วย Gemini",
-                guide_step4_title: "Adaptive Learning", guide_step4_desc: "ใช้หน่วยความจำเพื่อเรียนรู้จาก Feedback และปรับเปลี่ยนรูปแบบการสอนตามผู้ใช้",
+                guide_step1_title: "เขียนโค้ด (Write Code)", guide_step1_desc: "สร้างโค้ด Python, JavaScript และภาษาอื่นๆ พร้อมคำอธิบายและแนวทางการแก้ไขบั๊ก",
+                guide_step2_title: "วิเคราะห์ข้อมูล (Analyze)", guide_step2_desc: "อ่านและสรุปข้อมูลจากไฟล์ PDF หรือข้อความยาวๆ เพื่อดึงประเด็นสำคัญและข้อมูลเชิงลึก",
+                guide_step3_title: "คำนวณ (Calculate)", guide_step3_desc: "ช่วยคำนวณสูตรทางคณิตศาสตร์ แก้โจทย์ปัญหา และประมวลผลตรรกะที่ซับซ้อน",
+                guide_step4_title: "สอบถามทั่วไป (Inquiry)", guide_step4_desc: "ตอบคำถามทั่วไป ให้ข้อมูลความรู้ และเป็นเพื่อนคู่คิดในการระดมสมอง",
                 
                 // Tabs
-                tab_ai_guide: "การทำงาน", tab_github: "สมัคร GitHub", tab_project: "สร้างโปรเจค",
+                tab_ai_guide: "ฟีเจอร์หลัก", tab_github: "สมัคร GitHub", tab_project: "สร้างโปรเจค",
                 
                 // GitHub Guide
                 gh_step1_title: "เข้าเว็บไซต์", gh_step1_desc: "ไปที่ github.com แล้วกดปุ่ม 'Sign up' มุมขวาบน",
@@ -1033,14 +1033,38 @@
             const sidebar = document.getElementById('chat-sidebar');
             const overlay = document.getElementById('sidebar-overlay');
             
-            if (sidebar.classList.contains('-translate-x-full')) {
+            // Check if currently closed (based on transform class or hidden state)
+            const isClosed = sidebar.classList.contains('-translate-x-full') || sidebar.classList.contains('hidden');
+            
+            if (isClosed) {
+                // Open Sidebar
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('flex');
+                
+                // Force reflow to ensure transition works
+                void sidebar.offsetWidth;
+                
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
-                // On mobile, sidebar should be absolute
-                if(window.innerWidth < 768) sidebar.classList.add('absolute');
+                
+                // On mobile, sidebar should be absolute and high z-index
+                if(window.innerWidth < 768) {
+                    sidebar.classList.add('absolute');
+                    sidebar.classList.add('z-50'); 
+                }
             } else {
+                // Close Sidebar
                 sidebar.classList.add('-translate-x-full');
                 overlay.classList.add('hidden');
+                
+                // Wait for animation to finish then hide element
+                setTimeout(() => {
+                    if(window.innerWidth < 768) {
+                        sidebar.classList.add('hidden');
+                        sidebar.classList.remove('flex');
+                        sidebar.classList.remove('z-50');
+                    }
+                }, 300);
             }
         };
 
@@ -1420,11 +1444,19 @@
             // Suggestion Chips (Only show if history is empty)
             if(chatHistory.length === 0) {
                  const chipsHtml = `
-                    <div id="suggestion-chips" class="flex md:flex-wrap gap-2 py-2 px-2 justify-start md:justify-start ml-0 md:ml-11 chips-container">
-                        <button onclick="fillPrompt('ช่วยเขียนโค้ด Python สำหรับ...')" class="px-3 py-1.5 bg-surface border border-border rounded-full text-xs text-txt-sec hover:bg-blue-600 hover:text-white hover:border-blue-500 transition shadow-sm flex items-center gap-1 flex-shrink-0 whitespace-nowrap"><span>💻</span> เขียนโค้ด</button>
-                        <button onclick="fillPrompt('ช่วยวิเคราะห์ข้อมูลจาก...')" class="px-3 py-1.5 bg-surface border border-border rounded-full text-xs text-txt-sec hover:bg-pink-600 hover:text-white hover:border-pink-500 transition shadow-sm flex items-center gap-1 flex-shrink-0 whitespace-nowrap"><span>📊</span> วิเคราะห์ข้อมูล</button>
-                        <button onclick="fillPrompt('ช่วยคำนวณ...')" class="px-3 py-1.5 bg-surface border border-border rounded-full text-xs text-txt-sec hover:bg-violet-600 hover:text-white hover:border-violet-500 transition shadow-sm flex items-center gap-1 flex-shrink-0 whitespace-nowrap"><span>🧮</span> คำนวณ</button>
-                        <button onclick="fillPrompt('ขอสอบถามเกี่ยวกับ...')" class="px-3 py-1.5 bg-surface border border-border rounded-full text-xs text-txt-sec hover:bg-emerald-600 hover:text-white hover:border-emerald-500 transition shadow-sm flex items-center gap-1 flex-shrink-0 whitespace-nowrap"><span>💬</span> สอบถามเรื่องทั่วไป</button>
+                    <div id="suggestion-chips" class="flex flex-wrap gap-2 py-2 px-2 justify-center md:justify-start ml-0 md:ml-11 chips-container">
+                        <button onclick="fillPrompt('ช่วยเขียนโค้ด Python สำหรับ...')" class="px-4 py-2 bg-surface border border-border rounded-full text-sm text-txt-sec hover:bg-blue-600 hover:text-white hover:border-blue-500 transition shadow-sm flex items-center gap-2 flex-grow md:flex-grow-0 justify-center">
+                            <span>💻</span> เขียนโค้ด
+                        </button>
+                        <button onclick="fillPrompt('ช่วยวิเคราะห์ข้อมูลจาก...')" class="px-4 py-2 bg-surface border border-border rounded-full text-sm text-txt-sec hover:bg-pink-600 hover:text-white hover:border-pink-500 transition shadow-sm flex items-center gap-2 flex-grow md:flex-grow-0 justify-center">
+                            <span>📊</span> วิเคราะห์ข้อมูล
+                        </button>
+                        <button onclick="fillPrompt('ช่วยคำนวณ...')" class="px-4 py-2 bg-surface border border-border rounded-full text-sm text-txt-sec hover:bg-violet-600 hover:text-white hover:border-violet-500 transition shadow-sm flex items-center gap-2 flex-grow md:flex-grow-0 justify-center">
+                            <span>🧮</span> คำนวณ
+                        </button>
+                        <button onclick="fillPrompt('ขอสอบถามเกี่ยวกับ...')" class="px-4 py-2 bg-surface border border-border rounded-full text-sm text-txt-sec hover:bg-emerald-600 hover:text-white hover:border-emerald-500 transition shadow-sm flex items-center gap-2 flex-grow md:flex-grow-0 justify-center">
+                            <span>💬</span> สอบถามทั่วไป
+                        </button>
                     </div>`;
                  container.insertAdjacentHTML('beforeend', chipsHtml);
             }
