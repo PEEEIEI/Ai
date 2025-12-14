@@ -1,9 +1,16 @@
 <!DOCTYPE html>
 <html lang="th">
+    <head>
+    <title>Ciel</title>
+    <link rel="icon" type="image/x-icon" href="Pink.png">
+</head>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ciel - Intelligent Multi-Agent Engine</title>
+    <title>Ciel</title>
+    
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,7 +38,7 @@
                     },
                     animation: {
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'fade-in': 'fadeIn 0.5s ease-out',
                     },
                     keyframes: {
                         fadeIn: {
@@ -55,10 +62,10 @@
         /* --- THEME VARIABLES --- */
         :root {
             /* Default (Dark) - Slate based */
-            --bg-rgb: 15, 23, 42;        /* slate-900 */
-            --surface-rgb: 30, 41, 59;   /* slate-800 */
-            --surface2-rgb: 51, 65, 85;  /* slate-700 */
-            --border-rgb: 51, 65, 85;    /* slate-700 */
+            --bg-rgb: 15, 23, 42;         /* slate-900 */
+            --surface-rgb: 30, 41, 59;    /* slate-800 */
+            --surface2-rgb: 51, 65, 85;   /* slate-700 */
+            --border-rgb: 51, 65, 85;     /* slate-700 */
             --text-main-rgb: 226, 232, 240; /* slate-200 */
             --text-sec-rgb: 203, 213, 225;  /* slate-300 */
             --text-muted-rgb: 148, 163, 184; /* slate-400 */
@@ -66,7 +73,7 @@
 
         [data-theme="light"] {
             /* Light Theme - White/Gray based */
-            --bg-rgb: 248, 250, 252;     /* slate-50 */
+            --bg-rgb: 248, 250, 252;       /* slate-50 */
             --surface-rgb: 255, 255, 255; /* white */
             --surface2-rgb: 226, 232, 240; /* slate-200 */
             --border-rgb: 203, 213, 225;   /* slate-300 */
@@ -642,11 +649,11 @@
                 <!-- Content: GitHub Signup Guide -->
                 <div id="content-github" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
                     <!-- GitHub Step 1 -->
-                    <div class="bg-surface/50 p-6 rounded-2xl border border-red-500/30 hover:border-red-500 transition duration-300 relative overflow-hidden group">
+                    <div class="bg-surface/50 p-6 rounded-2xl border border-border hover:border-white/50 transition duration-300 relative overflow-hidden group">
                         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
-                            <span class="text-6xl font-bold text-red-500">01</span>
+                            <span class="text-6xl font-bold text-white">01</span>
                         </div>
-                        <div class="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center mb-4 text-red-500">
+                        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-4 text-white">
                             <i data-lucide="globe" class="w-6 h-6"></i>
                         </div>
                         <h3 class="text-xl font-bold mb-2 text-txt-main" data-i18n="gh_step1_title">Go to Website</h3>
@@ -656,11 +663,11 @@
                     </div>
 
                     <!-- GitHub Step 2 -->
-                    <div class="bg-surface/50 p-6 rounded-2xl border border-red-500/30 hover:border-red-500 transition duration-300 relative overflow-hidden group">
+                    <div class="bg-surface/50 p-6 rounded-2xl border border-border hover:border-white/50 transition duration-300 relative overflow-hidden group">
                         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
-                            <span class="text-6xl font-bold text-red-500">02</span>
+                            <span class="text-6xl font-bold text-white">02</span>
                         </div>
-                        <div class="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center mb-4 text-red-500">
+                        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-4 text-white">
                             <i data-lucide="mail" class="w-6 h-6"></i>
                         </div>
                         <h3 class="text-xl font-bold mb-2 text-txt-main" data-i18n="gh_step2_title">Enter Details</h3>
@@ -670,11 +677,11 @@
                     </div>
 
                     <!-- GitHub Step 3 -->
-                    <div class="bg-surface/50 p-6 rounded-2xl border border-red-500/30 hover:border-red-500 transition duration-300 relative overflow-hidden group">
+                    <div class="bg-surface/50 p-6 rounded-2xl border border-border hover:border-white/50 transition duration-300 relative overflow-hidden group">
                         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
-                            <span class="text-6xl font-bold text-red-500">03</span>
+                            <span class="text-6xl font-bold text-white">03</span>
                         </div>
-                        <div class="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center mb-4 text-red-500">
+                        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-4 text-white">
                             <i data-lucide="shield-check" class="w-6 h-6"></i>
                         </div>
                         <h3 class="text-xl font-bold mb-2 text-txt-main" data-i18n="gh_step3_title">Verify Account</h3>
@@ -684,11 +691,11 @@
                     </div>
 
                     <!-- GitHub Step 4 -->
-                    <div class="bg-surface/50 p-6 rounded-2xl border border-red-500/30 hover:border-red-500 transition duration-300 relative overflow-hidden group">
+                    <div class="bg-surface/50 p-6 rounded-2xl border border-border hover:border-white/50 transition duration-300 relative overflow-hidden group">
                         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
-                            <span class="text-6xl font-bold text-red-500">04</span>
+                            <span class="text-6xl font-bold text-white">04</span>
                         </div>
-                        <div class="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center mb-4 text-red-500">
+                        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-4 text-white">
                             <i data-lucide="check-circle" class="w-6 h-6"></i>
                         </div>
                         <h3 class="text-xl font-bold mb-2 text-txt-main" data-i18n="gh_step4_title">Complete</h3>
@@ -766,7 +773,7 @@
             <div class="w-full max-w-7xl flex gap-4 h-full relative">
                 
                 <!-- Sidebar (History) -->
-                <aside id="chat-sidebar" class="hidden md:flex flex-col w-64 bg-surface/80 backdrop-blur-xl border border-border rounded-3xl shadow-xl overflow-hidden transition-all absolute md:static inset-y-0 left-0 z-40 md:z-30 transform -translate-x-full md:translate-x-0 h-full">
+                <aside id="chat-sidebar" class="hidden md:flex flex-col w-64 bg-surface/80 backdrop-blur-xl border border-border rounded-3xl shadow-xl overflow-hidden transition-all absolute md:static inset-y-0 left-0 z-30 transform -translate-x-full md:translate-x-0 h-full">
                     <div class="p-4 border-b border-border flex justify-between items-center bg-surface2/30">
                         <h3 class="font-bold text-txt-main flex items-center gap-2">
                             <i data-lucide="history" class="w-4 h-4 text-pink-500"></i> History
@@ -781,7 +788,7 @@
                 </aside>
 
                 <!-- Overlay for Mobile Sidebar -->
-                <div id="sidebar-overlay" onclick="toggleChatSidebar()" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden glass"></div>
+                <div id="sidebar-overlay" onclick="toggleChatSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden glass"></div>
 
                 <!-- Main Chat Area -->
                 <section class="flex-1 bg-surface/80 backdrop-blur-xl border border-border rounded-3xl shadow-xl overflow-hidden flex flex-col relative h-full">
@@ -826,8 +833,8 @@
                                             </div>
                                             <button onclick="selectAgent('ciel')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-white/5 hover:text-white text-xs text-txt-sec transition-all flex items-center gap-3 group relative overflow-hidden">
                                                 <div class="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                                                    <span class="text-white font-bold text-xs">C1</span>
+                                                <div class="w-8 h-8 rounded-lg bg-white p-0.5 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform overflow-hidden">
+                                                    <img src="Pink.png" alt="CTC" class="w-full h-full object-contain" onerror="this.src='https://upload.wikimedia.org/wikipedia/th/f/fc/Chonburi_Technical_College_Logo.png'; this.onerror=null;">
                                                 </div>
                                                 <div class="flex flex-col">
                                                     <span class="font-bold text-txt-main">Ciel (Main)</span>
@@ -837,15 +844,16 @@
                                             </button>
 
                                             <button onclick="selectAgent('agent2')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-white/5 hover:text-white text-xs text-txt-sec transition-all flex items-center gap-3 group relative overflow-hidden">
-                                                <div class="absolute inset-0 bg-gradient-to-r from-violet-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                                                    <span class="text-white font-bold text-xs">C2</span>
+                                                <div class="absolute inset-0 bg-gradient-to-r from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                                <!-- Changed Icon to Image for CTC (FIXED) -->
+                                                <div class="w-8 h-8 rounded-lg bg-white p-0.5 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform overflow-hidden">
+                                                    <img src="ctc_logo.png" alt="CTC" class="w-full h-full object-contain" onerror="this.src='https://upload.wikimedia.org/wikipedia/th/f/fc/Chonburi_Technical_College_Logo.png'; this.onerror=null;">
                                                 </div>
                                                 <div class="flex flex-col">
-                                                    <span class="font-bold text-txt-main">Ciel (Pro)</span>
-                                                    <span class="text-[10px] text-txt-muted">Advanced Logic</span>
+                                                    <span class="font-bold text-txt-main">CTC</span>
+                                                    <span class="text-[10px] text-txt-muted">Chonburi Tech</span>
                                                 </div>
-                                                <i data-lucide="check" class="w-3 h-3 text-violet-400 ml-auto opacity-0 check-icon-agent2"></i>
+                                                <i data-lucide="check" class="w-3 h-3 text-red-400 ml-auto opacity-0 check-icon-agent2"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -932,7 +940,7 @@
         };
         const AGENT_LABELS = {
             'ciel': 'Ciel (Main)',
-            'agent2': 'Ciel (Pro)'
+            'agent2': 'CTC'
         };
         let currentAgent = localStorage.getItem('current_agent') || 'ciel';
 
@@ -1012,11 +1020,11 @@
                 login_title: "Welcome Back", login_subtitle: "Access your dashboard", btn_login: "Sign In",
                 signup_title: "Create Account", signup_subtitle: "Join the network", btn_signup: "Create Account",
                 
-                // Ciel Logic Guide (Synced with Thai)
-                guide_step1_title: "Write Code", guide_step1_desc: "Generate Python, JavaScript, and other code snippets with detailed explanations and debugging guidelines.",
-                guide_step2_title: "Analyze Data", guide_step2_desc: "Process and analyze raw data or complex documents to extract key insights, identify trends, and present information for effective decision-making.",
-                guide_step3_title: "Calculate", guide_step3_desc: "Assist with mathematical formulas, solve problems, and process complex logical operations.",
-                guide_step4_title: "General Inquiry", guide_step4_desc: "Answer general questions, provide knowledge, and act as a thinking partner for brainstorming ideas.",
+                // Ciel Logic Guide
+                guide_step1_title: "Research Agent", guide_step1_desc: "Parses unstructured PDF data and validates factual accuracy via OpenRouter & Wikipedia.",
+                guide_step2_title: "Technical Synthesis", guide_step2_desc: "Functions as an intelligent tutor, generating executable code (Python/JS) and pedagogical guides.",
+                guide_step3_title: "Creative Agent", guide_step3_desc: "Synthesizes research into engaging narratives and precise Text-to-Image prompts using Gemini.",
+                guide_step4_title: "Adaptive Learning", guide_step4_desc: "Utilizes memory to learn from feedback, adapting teaching styles and coding patterns over time.",
                 
                 // Tabs
                 tab_ai_guide: "System Logic", tab_github: "GitHub", tab_project: "New Project",
@@ -1048,9 +1056,9 @@
                 login_title: "ยินดีต้อนรับกลับ", login_subtitle: "เข้าสู่ระบบเพื่อใช้งาน", btn_login: "เข้าสู่ระบบ",
                 signup_title: "สร้างบัญชีใหม่", signup_subtitle: "เข้าร่วมเครือข่าย", btn_signup: "สมัครสมาชิก",
                 
-                // Ciel Logic Guide (Based on Image Reference)
+                // Ciel Logic Guide (TH)
                 guide_step1_title: "เขียนโค้ด (Write Code)", guide_step1_desc: "สร้างโค้ด Python, JavaScript และภาษาอื่นๆ พร้อมคำอธิบายและแนวทางการแก้ไขบั๊ก",
-                guide_step2_title: "วิเคราะห์ข้อมูล (Analyze)", guide_step2_desc: "ประมวลผลและวิเคราะห์ข้อมูลดิบหรือเอกสารซับซ้อน เพื่อสกัดจับใจความสำคัญ ค้นหาแนวโน้ม และนำเสนอข้อมูลเชิงลึกที่ช่วยในการตัดสินใจได้อย่างมีประสิทธิภาพ",
+                guide_step2_title: "วิเคราะห์ข้อมูล (Analyze)", guide_step2_desc: "อ่านและสรุปข้อมูลจากไฟล์ PDF หรือข้อความยาวๆ เพื่อดึงประเด็นสำคัญและข้อมูลเชิงลึก",
                 guide_step3_title: "คำนวณ (Calculate)", guide_step3_desc: "ช่วยคำนวณสูตรทางคณิตศาสตร์ แก้โจทย์ปัญหา และประมวลผลตรรกะที่ซับซ้อน",
                 guide_step4_title: "สอบถามทั่วไป (Inquiry)", guide_step4_desc: "ตอบคำถามทั่วไป ให้ข้อมูลความรู้ และเป็นเพื่อนคู่คิดในการระดมสมอง",
                 
@@ -1165,7 +1173,7 @@
                 // On mobile, sidebar should be absolute and high z-index
                 if(window.innerWidth < 768) {
                     sidebar.classList.add('absolute');
-                    // sidebar.classList.add('z-50'); 
+                    sidebar.classList.add('z-50'); 
                 }
             } else {
                 // Close Sidebar
@@ -1177,7 +1185,7 @@
                     if(window.innerWidth < 768) {
                         sidebar.classList.add('hidden');
                         sidebar.classList.remove('flex');
-                        // sidebar.classList.remove('z-50');
+                        sidebar.classList.remove('z-50');
                     }
                 }, 300);
             }
@@ -1519,15 +1527,10 @@
 
         // --- Chat Rendering & Logic ---
         function scrollToBottom() {
-            const container = document.getElementById('messages');
-            if (container) {
-                setTimeout(() => {
-                    container.scrollTo({
-                        top: container.scrollHeight,
-                        behavior: 'smooth'
-                    });
-                }, 100);
-            }
+             const container = document.getElementById('messages');
+             setTimeout(() => {
+                 container.scrollTop = container.scrollHeight;
+             }, 50);
         }
 
         function loadChatHistory() {
@@ -1667,9 +1670,7 @@
                 const textDiv = document.createElement('div');
                 if(typeof marked !== 'undefined') {
                     try { 
-                        // Fix for deprecated marked.parse in some CDN versions
-                        const parseMarkdown = marked.parse ? marked.parse : marked;
-                        const rawHtml = parseMarkdown(content);
+                        const rawHtml = marked.parse ? marked.parse(content) : content;
                         const cleanHtml = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(rawHtml) : rawHtml;
                         textDiv.innerHTML = cleanHtml;
                         
@@ -1698,6 +1699,7 @@
                                 previewContainer.appendChild(header);
                                 previewContainer.appendChild(iframe);
                                 preElement.parentNode.insertBefore(previewContainer, preElement.nextSibling);
+                                if(typeof lucide !== 'undefined') lucide.createIcons();
                             });
                             addCopyButtons(textDiv);
                             if(typeof lucide !== 'undefined') lucide.createIcons();
@@ -1705,7 +1707,6 @@
 
                     } catch(e) { 
                         textDiv.innerText = content; 
-                        console.error('Markdown parsing error:', e);
                     }
                 } else {
                     textDiv.innerText = content;
@@ -1717,9 +1718,6 @@
             wrapper.appendChild(bubble);
             container.appendChild(wrapper);
             scrollToBottom();
-            
-            // Ensure icons are created for new elements
-            setTimeout(() => { if(typeof lucide !== 'undefined') lucide.createIcons(); }, 10);
         }
 
         // UPDATED: addMessage stores state
