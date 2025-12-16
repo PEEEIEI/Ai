@@ -1780,12 +1780,14 @@
                 let stars = [];
                 let shootingStars = [];
                 let rockets = []; 
-                let particles = []; // เพิ่มระบบ Particle สำหรับไอพ่น
+                let particles = []; 
+                let planets = []; 
                 
                 // Configuration
                 const STAR_COUNT = 300; 
                 const SHOOTING_STAR_FREQUENCY = 0.015; 
-                const ROCKET_FREQUENCY = 0.008; // ความถี่จรวด
+                const ROCKET_FREQUENCY = 0.005; 
+                const PLANET_COUNT = 3; // เพิ่มจำนวนดาวเคราะห์
                 
                 const resize = () => {
                     width = window.innerWidth;
@@ -1795,6 +1797,153 @@
                 };
                 
                 // --- Classes ---
+
+                class Planet {
+                    constructor() {
+                        // Create an offscreen canvas for the planet texture to improve performance
+                        this.textureCanvas = document.createElement('canvas');
+                        this.txCtx = this.textureCanvas.getContext('2d');
+                        this.reset();
+                        // Random start position scattered
+                        this.x = Math.random() * width;
+                        this.y = Math.random() * height;
+                    }
+
+                    reset() {
+                        this.radius = 30 + Math.random() * 60; // ขนาดหลากหลาย
+                        
+                        // Spawn logic (outside screen)
+                        const side = Math.floor(Math.random() * 4);
+                        if(side === 0) { this.x = -this.radius * 2; this.y = Math.random() * height; }
+                        else if(side === 1) { this.x = width + this.radius * 2; this.y = Math.random() * height; }
+                        else if(side === 2) { this.x = Math.random() * width; this.y = -this.radius * 2; }
+                        else { this.x = Math.random() * width; this.y = height + this.radius * 2; }
+
+                        // Palette: Anime style (Purple, Pink, Cyan, Orange)
+                        const hues = [250, 320, 190, 30, 210];
+                        this.hue = hues[Math.floor(Math.random() * hues.length)];
+                        this.type = Math.random() < 0.6 ? 'gas' : 'rocky'; // Gas Giant or Rocky Planet
+                        this.hasRing = Math.random() < 0.3;
+                        
+                        // Movement
+                        this.vx = (Math.random() - 0.5) * 0.15; 
+                        this.vy = (Math.random() - 0.5) * 0.15;
+                        this.angle = Math.random() * Math.PI * 2;
+                        this.rotationSpeed = (Math.random() - 0.5) * 0.005;
+
+                        // --- Generate Texture ---
+                        this.textureCanvas.width = this.radius * 2;
+                        this.textureCanvas.height = this.radius * 2;
+                        const tCtx = this.txCtx;
+                        const cx = this.radius;
+                        const cy = this.radius;
+
+                        tCtx.clearRect(0, 0, this.radius*2, this.radius*2);
+
+                        // Base Circle
+                        tCtx.beginPath();
+                        tCtx.arc(cx, cy, this.radius, 0, Math.PI * 2);
+                        tCtx.fillStyle = `hsl(${this.hue}, 60%, 50%)`;
+                        tCtx.fill();
+                        
+                        // Masking for details
+                        tCtx.save();
+                        tCtx.beginPath();
+                        tCtx.arc(cx, cy, this.radius, 0, Math.PI * 2);
+                        tCtx.clip();
+
+                        if (this.type === 'gas') {
+                            // Gas Giant Stripes
+                            tCtx.translate(cx, cy);
+                            tCtx.rotate(Math.PI / 6); // Tilted stripes
+                            for(let i=0; i<8; i++) {
+                                tCtx.fillStyle = `hsla(${this.hue}, ${70 + Math.random()*20}%, ${40 + Math.random()*30}%, 0.4)`;
+                                const h = Math.random() * this.radius * 0.5;
+                                const yPos = (Math.random() - 0.5) * this.radius * 2;
+                                tCtx.fillRect(-this.radius, yPos, this.radius * 2, h);
+                            }
+                        } else {
+                            // Rocky Craters
+                            for(let i=0; i<12; i++) {
+                                const r = Math.random() * this.radius * 0.25;
+                                const x = Math.random() * this.radius * 2;
+                                const y = Math.random() * this.radius * 2;
+                                tCtx.beginPath();
+                                tCtx.arc(x, y, r, 0, Math.PI * 2);
+                                tCtx.fillStyle = `hsla(${this.hue}, 50%, 30%, 0.3)`;
+                                tCtx.fill();
+                            }
+                        }
+                        tCtx.restore();
+                    }
+
+                    update() {
+                        this.x += this.vx;
+                        this.y += this.vy;
+                        this.angle += this.rotationSpeed;
+
+                        // Wrap around
+                        const buffer = this.radius * 3;
+                        if (this.x < -buffer) this.x = width + buffer;
+                        if (this.x > width + buffer) this.x = -buffer;
+                        if (this.y < -buffer) this.y = height + buffer;
+                        if (this.y > height + buffer) this.y = -buffer;
+                    }
+
+                    draw() {
+                        ctx.save();
+                        ctx.translate(this.x, this.y);
+
+                        // 1. Draw Atmosphere Glow (Outer)
+                        ctx.shadowColor = `hsla(${this.hue}, 80%, 70%, 0.6)`;
+                        ctx.shadowBlur = this.radius * 0.8;
+                        ctx.beginPath();
+                        ctx.arc(0, 0, this.radius * 0.9, 0, Math.PI*2); // Dummy draw to cast shadow
+                        ctx.fillStyle = 'rgba(0,0,0,0)';
+                        ctx.fill();
+                        ctx.shadowBlur = 0; // Reset shadow
+
+                        // 2. Draw Planet Surface (Rotated)
+                        ctx.save();
+                        ctx.rotate(this.angle);
+                        ctx.drawImage(this.textureCanvas, -this.radius, -this.radius);
+                        ctx.restore();
+
+                        // 3. Draw Shadow (Fixed Direction - Top Left Light)
+                        // Create crescent shadow effect
+                        const grad = ctx.createRadialGradient(-this.radius*0.3, -this.radius*0.3, this.radius*0.2, 0, 0, this.radius);
+                        grad.addColorStop(0, 'rgba(0,0,0,0)');     // Highlight area transparent
+                        grad.addColorStop(0.5, 'rgba(0,0,0,0.1)'); 
+                        grad.addColorStop(1, 'rgba(0,0,0,0.8)');    // Shadow area dark
+                        
+                        ctx.fillStyle = grad;
+                        ctx.beginPath();
+                        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // 4. Draw Ring (If any)
+                        if (this.hasRing) {
+                            ctx.rotate(-Math.PI / 4); // Fixed tilt for ring
+                            ctx.beginPath();
+                            ctx.strokeStyle = `hsla(${this.hue}, 40%, 80%, 0.4)`;
+                            ctx.lineWidth = this.radius * 0.25;
+                            // Draw back part of ring (masked by planet usually, but simplified here with layering)
+                            // Actually, let's just draw elliptical ring on top but use composite operation for "behind" feel if needed
+                            // For simplicity in 2D, just drawing it on top looks okay if styled right
+                            ctx.ellipse(0, 0, this.radius * 1.8, this.radius * 0.5, 0, 0, Math.PI * 2);
+                            ctx.stroke();
+                            
+                            // Thin inner line
+                            ctx.beginPath();
+                            ctx.strokeStyle = `hsla(${this.hue}, 80%, 90%, 0.6)`;
+                            ctx.lineWidth = 1;
+                            ctx.ellipse(0, 0, this.radius * 1.6, this.radius * 0.4, 0, 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+
+                        ctx.restore();
+                    }
+                }
 
                 class Particle {
                     constructor(x, y, angle, speed, color, life) {
@@ -1806,7 +1955,7 @@
                         this.life = life;
                         this.maxLife = life;
                         this.size = Math.random() * 2 + 1;
-                        this.decay = Math.random() * 0.03 + 0.02;
+                        this.decay = Math.random() * 0.02 + 0.01; 
                     }
 
                     update() {
@@ -1915,6 +2064,8 @@
                     }
 
                     reset() {
+                        this.type = Math.floor(Math.random() * 3); // สุ่มประเภทจรวด 0, 1, 2
+
                         const startSide = Math.random();
                         if (startSide < 0.6) { // Bottom
                             this.x = Math.random() * width;
@@ -1933,10 +2084,21 @@
                         const dy = targetY - this.y;
                         
                         this.angle = Math.atan2(dy, dx);
-                        this.speed = 1 + Math.random() * 1.5; // ปรับความเร็วลดลง (เดิม 3 + ...)
+                        
+                        // --- ปรับความเร็วให้ช้าลงอีก (Slower Speeds) ---
+                        if (this.type === 0) { // Speedster
+                            this.speed = 2.5 + Math.random() * 1.5; // เดิม 6-9 -> เหลือ 2.5-4
+                            this.scale = 0.6 + Math.random() * 0.3;
+                        } else if (this.type === 1) { // Heavy
+                            this.speed = 1.5 + Math.random() * 1; // เดิม 3-5 -> เหลือ 1.5-2.5
+                            this.scale = 0.8 + Math.random() * 0.4;
+                        } else { // Stealth
+                            this.speed = 3.5 + Math.random() * 2; // เดิม 8-12 -> เหลือ 3.5-5.5
+                            this.scale = 0.5 + Math.random() * 0.3;
+                        }
+
                         this.vx = Math.cos(this.angle) * this.speed;
                         this.vy = Math.sin(this.angle) * this.speed;
-                        this.scale = 0.6 + Math.random() * 0.4; 
                     }
 
                     update() {
@@ -1950,11 +2112,19 @@
                             const px = this.x + Math.cos(backAngle) * offset;
                             const py = this.y + Math.sin(backAngle) * offset;
                             
-                            for(let i=0; i<2; i++) {
-                                const spread = (Math.random() - 0.5) * 0.5;
-                                const pSpeed = Math.random() * 2;
-                                const color = Math.random() < 0.3 ? '#3b82f6' : (Math.random() < 0.6 ? '#8b5cf6' : '#ffffff');
-                                particles.push(new Particle(px, py, backAngle + spread, pSpeed, color, 1.0));
+                            // สีไอพ่นตามประเภท
+                            let pColor;
+                            if (this.type === 0) pColor = Math.random() < 0.5 ? '#3b82f6' : '#ffffff'; // ฟ้าขาว
+                            else if (this.type === 1) pColor = Math.random() < 0.5 ? '#f97316' : '#ef4444'; // ส้มแดง
+                            else pColor = Math.random() < 0.5 ? '#10b981' : '#8b5cf6'; // เขียวม่วง
+
+                            // ปล่อย particle น้อยลงนิดนึงเพราะวิ่งช้า เดี๋ยวควันมันจะหนาเกิน
+                            if (Math.random() > 0.3) {
+                                for(let i=0; i<1; i++) {
+                                    const spread = (Math.random() - 0.5) * 0.5;
+                                    const pSpeed = Math.random() * 1; // ความเร็วควันช้าลง
+                                    particles.push(new Particle(px, py, backAngle + spread, pSpeed, pColor, 1.2));
+                                }
                             }
                         }
 
@@ -1969,82 +2139,90 @@
                         ctx.rotate(this.angle + Math.PI / 2);
                         ctx.scale(this.scale, this.scale);
 
-                        // --- DRAW COOL SPACESHIP ---
-                        
-                        // Engine Glow
-                        ctx.shadowBlur = 15;
-                        ctx.shadowColor = '#3b82f6';
-                        ctx.fillStyle = '#3b82f6';
-                        ctx.beginPath();
-                        ctx.arc(0, 25, 8, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.shadowBlur = 0;
+                        if (this.type === 0) {
+                            // --- TYPE 1: SPEEDSTER (The Original) ---
+                            // Engine Glow
+                            ctx.shadowBlur = 15; ctx.shadowColor = '#3b82f6'; ctx.fillStyle = '#3b82f6';
+                            ctx.beginPath(); ctx.arc(0, 25, 8, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
 
-                        // Wings (Back)
-                        ctx.fillStyle = '#cbd5e1'; 
-                        ctx.beginPath();
-                        ctx.moveTo(0, 10);
-                        ctx.lineTo(-20, 35);
-                        ctx.lineTo(-5, 20);
-                        ctx.lineTo(5, 20);
-                        ctx.lineTo(20, 35);
-                        ctx.lineTo(0, 10);
-                        ctx.fill();
+                            // Wings
+                            ctx.fillStyle = '#cbd5e1'; 
+                            ctx.beginPath(); ctx.moveTo(0, 10); ctx.lineTo(-20, 35); ctx.lineTo(-5, 20); 
+                            ctx.lineTo(5, 20); ctx.lineTo(20, 35); ctx.lineTo(0, 10); ctx.fill();
 
-                        // Main Fuselage
-                        ctx.fillStyle = '#f8fafc'; 
-                        ctx.beginPath();
-                        ctx.moveTo(0, -35); // Nose
-                        ctx.bezierCurveTo(15, -10, 15, 10, 10, 30); 
-                        ctx.lineTo(-10, 30); 
-                        ctx.bezierCurveTo(-15, 10, -15, -10, 0, -35); 
-                        ctx.fill();
+                            // Body
+                            ctx.fillStyle = '#f8fafc'; 
+                            ctx.beginPath(); ctx.moveTo(0, -35); ctx.bezierCurveTo(15, -10, 15, 10, 10, 30); 
+                            ctx.lineTo(-10, 30); ctx.bezierCurveTo(-15, 10, -15, -10, 0, -35); ctx.fill();
 
-                        // Cockpit Glass
-                        ctx.fillStyle = '#06b6d4'; 
-                        ctx.shadowBlur = 5;
-                        ctx.shadowColor = 'rgba(6, 182, 212, 0.8)';
-                        ctx.beginPath();
-                        ctx.ellipse(0, -5, 4, 12, 0, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.shadowBlur = 0;
+                            // Cockpit
+                            ctx.fillStyle = '#06b6d4'; ctx.beginPath(); ctx.ellipse(0, -5, 4, 12, 0, 0, Math.PI * 2); ctx.fill();
 
-                        // Details (Red Stripes)
-                        ctx.fillStyle = '#ef4444';
-                        ctx.beginPath();
-                        ctx.moveTo(-12, 10);
-                        ctx.lineTo(-12, 25);
-                        ctx.lineTo(-8, 10);
-                        ctx.fill();
-                        
-                        ctx.beginPath();
-                        ctx.moveTo(12, 10);
-                        ctx.lineTo(12, 25);
-                        ctx.lineTo(8, 10);
-                        ctx.fill();
+                            // Details
+                            ctx.fillStyle = '#ef4444';
+                            ctx.beginPath(); ctx.moveTo(-12, 10); ctx.lineTo(-12, 25); ctx.lineTo(-8, 10); ctx.fill();
+                            ctx.beginPath(); ctx.moveTo(12, 10); ctx.lineTo(12, 25); ctx.lineTo(8, 10); ctx.fill();
 
-                        // --- CTC Text Trailing (Hologram Effect) ---
+                        } else if (this.type === 1) {
+                            // --- TYPE 2: HEAVY LIFTER (Retro Style) ---
+                            // Engine Glow
+                            ctx.shadowBlur = 15; ctx.shadowColor = '#f97316'; ctx.fillStyle = '#f97316';
+                            ctx.beginPath(); ctx.rect(-8, 30, 16, 5); ctx.fill(); ctx.shadowBlur = 0;
+
+                            // Fins
+                            ctx.fillStyle = '#94a3b8';
+                            ctx.beginPath(); ctx.moveTo(0, 10); ctx.lineTo(-25, 40); ctx.lineTo(-10, 20); 
+                            ctx.lineTo(10, 20); ctx.lineTo(25, 40); ctx.lineTo(0, 10); ctx.fill();
+
+                            // Body (Orange/Industrial)
+                            ctx.fillStyle = '#ea580c';
+                            ctx.beginPath(); ctx.ellipse(0, 0, 15, 35, 0, 0, Math.PI * 2); ctx.fill();
+                            
+                            // Stripe
+                            ctx.fillStyle = '#fbbf24';
+                            ctx.fillRect(-15, -10, 30, 5);
+
+                            // Porthole (Round)
+                            ctx.fillStyle = '#bfdbfe'; ctx.strokeStyle = '#475569'; ctx.lineWidth = 2;
+                            ctx.beginPath(); ctx.arc(0, -15, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+                        } else {
+                            // --- TYPE 3: STEALTH (Alien Tech) ---
+                            // Engine Glow
+                            ctx.shadowBlur = 15; ctx.shadowColor = '#10b981'; ctx.fillStyle = '#10b981';
+                            ctx.beginPath(); ctx.moveTo(0, 20); ctx.lineTo(-5, 30); ctx.lineTo(5, 30); ctx.fill(); ctx.shadowBlur = 0;
+
+                            // Body (Black/Dark Purple)
+                            ctx.fillStyle = '#1e293b';
+                            ctx.beginPath(); ctx.moveTo(0, -40); ctx.lineTo(15, 20); ctx.lineTo(0, 15); ctx.lineTo(-15, 20); ctx.fill();
+
+                            // Neon Lines
+                            ctx.strokeStyle = '#8b5cf6'; ctx.lineWidth = 1.5;
+                            ctx.beginPath(); ctx.moveTo(0, -40); ctx.lineTo(0, 15); ctx.stroke();
+                            
+                            ctx.strokeStyle = '#10b981';
+                            ctx.beginPath(); ctx.moveTo(-5, 0); ctx.lineTo(-15, 20); ctx.stroke();
+                            ctx.beginPath(); ctx.moveTo(5, 0); ctx.lineTo(15, 20); ctx.stroke();
+                        }
+
+                        // --- CTC Text Trailing (Common) ---
                         ctx.save();
-                        ctx.translate(0, 65); // Move behind the engine
-                        // Pulse effect
+                        ctx.translate(0, 65);
                         const pulse = 0.6 + Math.abs(Math.sin(Date.now() * 0.008)) * 0.4;
-                        ctx.fillStyle = `rgba(236, 72, 153, ${pulse})`; // Pink glow like Ciel brand
-                        ctx.shadowColor = '#ec4899';
+                        // สีข้อความตามประเภท
+                        ctx.fillStyle = this.type === 2 ? `rgba(16, 185, 129, ${pulse})` : (this.type === 1 ? `rgba(251, 191, 36, ${pulse})` : `rgba(236, 72, 153, ${pulse})`);
+                        ctx.shadowColor = ctx.fillStyle;
                         ctx.shadowBlur = 15;
-                        ctx.font = "800 16px 'Fredoka'"; // Bold font
+                        ctx.font = "800 16px 'Fredoka'";
                         ctx.textAlign = "center";
                         ctx.textBaseline = "middle";
-                        
-                        // Rotate text to align with flight path
                         ctx.rotate(-Math.PI / 2); 
                         ctx.fillText("CTC", 0, 0);
                         
-                        // Add scanline effect
+                        // Scanline
                         ctx.fillStyle = `rgba(255, 255, 255, ${pulse * 0.5})`;
                         ctx.fillRect(-15, -1, 30, 2);
-                        
                         ctx.restore();
-                        // ------------------------------------------
 
                         ctx.restore();
                     }
@@ -2057,10 +2235,21 @@
                 for (let i = 0; i < STAR_COUNT; i++) {
                     stars.push(new Star());
                 }
+
+                // Initialize Planets
+                for (let i = 0; i < PLANET_COUNT; i++) {
+                    planets.push(new Planet());
+                }
                 
                 const animate = () => {
                     ctx.clearRect(0, 0, width, height);
                     
+                    // 0. Draw Planets (Behind stars for deep effect)
+                    planets.forEach(planet => {
+                        planet.update();
+                        planet.draw();
+                    });
+
                     // 1. Stars (Background)
                     stars.forEach(star => {
                         star.update();
@@ -2090,7 +2279,8 @@
                     }
 
                     // 4. Rockets
-                    if (Math.random() < ROCKET_FREQUENCY) {
+                    // เพิ่มเงื่อนไข rockets.length < 3 เพื่อจำกัดจำนวนตามที่เคยขอไว้
+                    if (rockets.length < 3 && Math.random() < ROCKET_FREQUENCY) {
                         rockets.push(new Rocket());
                     }
                     rockets.forEach((rocket, index) => {
