@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ciel</title>
-    <link rel="icon" type="image/x-icon" href="Pink.png">
+    <!-- Use a data URI for favicon to prevent 404s in preview -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
     
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -58,25 +59,25 @@
     <style>
         /* --- THEME VARIABLES --- */
         :root {
-            /* Default (Dark) - Slate based */
-            --bg-rgb: 15, 23, 42;         /* slate-900 */
-            --surface-rgb: 30, 41, 59;    /* slate-800 */
-            --surface2-rgb: 51, 65, 85;   /* slate-700 */
-            --border-rgb: 51, 65, 85;     /* slate-700 */
-            --text-main-rgb: 226, 232, 240; /* slate-200 */
-            --text-sec-rgb: 203, 213, 225;  /* slate-300 */
-            --text-muted-rgb: 148, 163, 184; /* slate-400 */
+            /* Default (Dark) - Deep Space based */
+            --bg-rgb: 10, 15, 30;         /* Deepest Blue/Black */
+            --surface-rgb: 23, 32, 56;    /* Dark Blue */
+            --surface2-rgb: 40, 50, 80;   /* Muted Blue */
+            --border-rgb: 60, 70, 100;    /* Steel Blue */
+            --text-main-rgb: 235, 240, 255; /* Starlight White */
+            --text-sec-rgb: 180, 190, 210;  /* Muted Starlight */
+            --text-muted-rgb: 120, 130, 160; /* Deep Space Grey */
         }
 
         [data-theme="light"] {
-            /* Light Theme - White/Gray based */
-            --bg-rgb: 248, 250, 252;       /* slate-50 */
-            --surface-rgb: 255, 255, 255; /* white */
-            --surface2-rgb: 226, 232, 240; /* slate-200 */
-            --border-rgb: 203, 213, 225;   /* slate-300 */
-            --text-main-rgb: 15, 23, 42;   /* slate-900 */
-            --text-sec-rgb: 51, 65, 85;    /* slate-700 */
-            --text-muted-rgb: 100, 116, 139; /* slate-500 */
+            /* Light Theme - Day Sky based */
+            --bg-rgb: 240, 248, 255;       /* Alice Blue */
+            --surface-rgb: 255, 255, 255;  /* White */
+            --surface2-rgb: 220, 235, 255; /* Light Sky */
+            --border-rgb: 200, 220, 240;   /* Cloud Blue */
+            --text-main-rgb: 20, 40, 80;   /* Dark Blue Text */
+            --text-sec-rgb: 60, 80, 120;   /* Medium Blue */
+            --text-muted-rgb: 100, 120, 150; /* Muted Blue */
         }
 
         [data-theme="midnight"] {
@@ -93,24 +94,38 @@
         /* Base Styles */
         body {
             font-family: 'Nunito', 'Sarabun', sans-serif;
-            background-color: rgb(var(--bg-rgb));
+            background-color: transparent; /* IMPORTANT: Transparent to show canvas */
             color: rgb(var(--text-main-rgb));
             overflow-x: hidden;
             overscroll-behavior-y: none; 
-            transition: background-color 0.5s ease, color 0.5s ease;
+            transition: color 0.5s ease;
         }
         h1, h2, h3, .brand-font {
             font-family: 'Fredoka', 'Sarabun', sans-serif;
         }
         
-        /* Background Blobs Animation */
+        /* Starry Canvas Background */
+        #starry-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -50; /* Behind everything */
+            pointer-events: none;
+            /* Default fallback background with gradient */
+            background: radial-gradient(circle at bottom center, rgb(var(--surface2-rgb)), rgb(var(--bg-rgb)));
+            transition: background 0.5s ease;
+        }
+        
+        /* Background Blobs Animation - Adjusted Z-index */
         .blob {
             position: absolute;
-            filter: blur(60px);
-            z-index: -1;
-            opacity: 0.5;
+            filter: blur(80px);
+            z-index: -40; /* Above canvas, behind content */
+            opacity: 0.4;
             will-change: transform;
-            animation: float 10s infinite ease-in-out;
+            animation: float 15s infinite ease-in-out;
         }
         
         /* Cool Sci-Fi Loader */
@@ -321,7 +336,7 @@
                 border: none !important;
                 width: 100%;
                 z-index: 40;
-                background-color: rgb(var(--bg-rgb));
+                background-color: transparent; /* Transparent on mobile too */
             }
             .mobile-hide { display: none !important; }
             main { padding: 0 !important; }
@@ -367,9 +382,13 @@
         <p class="loader-text">INITIALIZING...</p>
     </div>
 
-    <!-- Background Blobs -->
-    <div class="blob bg-purple-600 w-96 h-96 rounded-full top-0 left-0 -translate-x-1/2 -translate-y-1/2"></div>
-    <div class="blob bg-blue-600 w-80 h-80 rounded-full bottom-0 right-0 translate-x-1/3 translate-y-1/3"></div>
+    <!-- Starry Background Canvas -->
+    <canvas id="starry-bg"></canvas>
+
+    <!-- Background Blobs (Nebula Effect) -->
+    <div class="blob bg-purple-600/30 w-[500px] h-[500px] rounded-full top-0 left-0 -translate-x-1/3 -translate-y-1/3 mix-blend-screen"></div>
+    <div class="blob bg-blue-600/30 w-[400px] h-[400px] rounded-full bottom-0 right-0 translate-x-1/3 translate-y-1/3 mix-blend-screen"></div>
+    <div class="blob bg-pink-600/20 w-[300px] h-[300px] rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mix-blend-screen" style="animation-delay: -5s;"></div>
 
     <!-- Auth Modal -->
     <div id="auth-modal" class="modal">
@@ -453,12 +472,14 @@
     <nav id="main-nav" class="w-full p-4 md:p-6 flex flex-col z-20 sticky top-0 backdrop-blur-sm bg-background/10 transition-all">
         <div class="flex justify-between items-center w-full">
             <div onclick="navigateTo('home')" class="cursor-pointer flex items-center gap-3">
-                <img src="CTC.png" alt="CTC" class="h-14 md:h-19 w-auto object-contain hover:scale-110 transition-transform duration-300">
+                <!-- Added onerror fallback for image -->
+                <img src="CTC.png" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/th/f/fc/Chonburi_Technical_College_Logo.png';" alt="CTC" class="h-14 md:h-19 w-auto object-contain hover:scale-110 transition-transform duration-300">
             </div>
 
             <div class="hidden md:flex items-center gap-1 bg-surface/40 p-1.5 rounded-full border border-border/50 backdrop-blur-md shadow-xl ring-1 ring-white/10">
                 <button onclick="navigateTo('home')" id="nav-home" class="nav-link px-6 py-2 rounded-full text-txt-sec font-medium hover:text-txt-main hover:bg-white/10 transition-all duration-300 active" data-i18n="home">Home</button>
-                <button onclick="navigateTo('chat')" id="nav-chat" class="nav-link px-6 py-2 rounded-full text-txt-sec font-medium hover:text-txt-main hover:bg-white/10 transition-all duration-300" data-i18n="ai_friend">Ciel</button>
+                <button onclick="selectAgent('ciel'); navigateTo('chat', 'nav-chat')" id="nav-chat" class="nav-link px-6 py-2 rounded-full text-txt-sec font-medium hover:text-txt-main hover:bg-white/10 transition-all duration-300" data-i18n="ai_friend">Ciel</button>
+                <button onclick="selectAgent('agent2'); navigateTo('chat', 'nav-ctc')" id="nav-ctc" class="nav-link px-6 py-2 rounded-full text-txt-sec font-medium hover:text-txt-main hover:bg-white/10 transition-all duration-300">CTC</button>
             </div>
 
             <div class="flex items-center gap-2 md:gap-3">
@@ -511,8 +532,11 @@
                 <button onclick="navigateTo('home'); toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl hover:bg-background/10 text-txt-main font-medium transition flex items-center gap-3">
                     <i data-lucide="home" class="w-5 h-5 text-pink-400"></i> <span data-i18n="home">Home</span>
                 </button>
-                <button onclick="navigateTo('chat'); toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl hover:bg-background/10 text-txt-main font-medium transition flex items-center gap-3">
+                <button onclick="selectAgent('ciel'); navigateTo('chat', 'nav-chat'); toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl hover:bg-background/10 text-txt-main font-medium transition flex items-center gap-3">
                     <i data-lucide="message-circle" class="w-5 h-5 text-violet-400"></i> <span data-i18n="ai_friend">Ciel</span>
+                </button>
+                <button onclick="selectAgent('agent2'); navigateTo('chat', 'nav-ctc'); toggleMobileMenu()" class="text-left px-4 py-3 rounded-xl hover:bg-background/10 text-txt-main font-medium transition flex items-center gap-3">
+                    <i data-lucide="message-square" class="w-5 h-5 text-red-400"></i> <span>CTC</span>
                 </button>
                 
                 <div class="border-t border-border/50 my-2"></div>
@@ -1125,7 +1149,7 @@
             document.getElementById('content-' + tabName).classList.remove('hidden');
         };
 
-        window.navigateTo = function(viewId) {
+        window.navigateTo = function(viewId, specificNavId) {
             document.querySelectorAll('.view-section').forEach(el => {
                 el.classList.remove('active');
                 setTimeout(() => { if(!el.classList.contains('active')) el.style.display = 'none'; }, 300);
@@ -1135,8 +1159,12 @@
             setTimeout(() => selected.classList.add('active'), 10);
             
             document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('nav-btn-active'));
-            const activeBtn = document.getElementById('nav-' + viewId);
+            
+            // Use specificNavId if provided, otherwise fallback to standard naming
+            const targetNavId = specificNavId || 'nav-' + viewId;
+            const activeBtn = document.getElementById(targetNavId);
             if(activeBtn) activeBtn.classList.add('nav-btn-active');
+            
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
             if (viewId === 'chat') {
@@ -1741,6 +1769,348 @@
         // --- Initialization ---
         window.addEventListener('DOMContentLoaded', () => {
             applyTheme(currentTheme); 
+            
+            // --- STARRY BACKGROUND ANIMATION LOGIC ---
+            const initStarryBackground = () => {
+                const canvas = document.getElementById('starry-bg');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                let width, height;
+                let stars = [];
+                let shootingStars = [];
+                let rockets = []; 
+                let particles = []; // เพิ่มระบบ Particle สำหรับไอพ่น
+                
+                // Configuration
+                const STAR_COUNT = 300; 
+                const SHOOTING_STAR_FREQUENCY = 0.015; 
+                const ROCKET_FREQUENCY = 0.008; // ความถี่จรวด
+                
+                const resize = () => {
+                    width = window.innerWidth;
+                    height = window.innerHeight;
+                    canvas.width = width;
+                    canvas.height = height;
+                };
+                
+                // --- Classes ---
+
+                class Particle {
+                    constructor(x, y, angle, speed, color, life) {
+                        this.x = x;
+                        this.y = y;
+                        this.vx = Math.cos(angle) * speed;
+                        this.vy = Math.sin(angle) * speed;
+                        this.color = color;
+                        this.life = life;
+                        this.maxLife = life;
+                        this.size = Math.random() * 2 + 1;
+                        this.decay = Math.random() * 0.03 + 0.02;
+                    }
+
+                    update() {
+                        this.x += this.vx;
+                        this.y += this.vy;
+                        this.life -= this.decay;
+                        this.size *= 0.95;
+                    }
+
+                    draw() {
+                        ctx.globalAlpha = Math.max(0, this.life);
+                        ctx.fillStyle = this.color;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.globalAlpha = 1.0;
+                    }
+                }
+                
+                class Star {
+                    constructor() {
+                        this.reset();
+                    }
+                    
+                    reset() {
+                        this.x = Math.random() * width;
+                        this.y = Math.random() * height;
+                        this.z = Math.random() * 2 + 0.5; 
+                        this.size = Math.random() * 1.5;
+                        this.opacity = Math.random();
+                        this.blinkSpeed = Math.random() * 0.02 + 0.005;
+                        this.blinkDir = 1;
+                        this.velX = (Math.random() - 0.5) * 0.2; 
+                        this.velY = (Math.random() - 0.5) * 0.2;
+                    }
+                    
+                    update() {
+                        this.opacity += this.blinkSpeed * this.blinkDir;
+                        if (this.opacity > 1 || this.opacity < 0.2) this.blinkDir *= -1;
+                        
+                        this.x += this.velX * this.z; 
+                        this.y += this.velY * this.z;
+                        
+                        if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+                            this.reset();
+                        }
+                    }
+                    
+                    draw() {
+                        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size * this.z, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                
+                class ShootingStar {
+                    constructor() {
+                        this.reset();
+                    }
+                    
+                    reset() {
+                        this.x = Math.random() * width;
+                        this.y = Math.random() * height * 0.5; 
+                        this.len = Math.random() * 80 + 10;
+                        this.speed = Math.random() * 10 + 6;
+                        this.size = Math.random() * 1 + 0.1;
+                        this.angle = Math.PI / 4; 
+                        this.dirX = Math.cos(this.angle);
+                        this.dirY = Math.sin(this.angle);
+                        this.life = 0;
+                        this.maxLife = 100;
+                        this.active = true;
+                    }
+                    
+                    update() {
+                        this.x += this.dirX * this.speed;
+                        this.y += this.dirY * this.speed;
+                        this.life++;
+                        
+                        if (this.x > width + this.len || this.y > height + this.len || this.life > this.maxLife) {
+                            this.active = false;
+                        }
+                    }
+                    
+                    draw() {
+                        if (!this.active) return;
+                        const tailX = this.x - this.dirX * this.len;
+                        const tailY = this.y - this.dirY * this.len;
+                        const gradient = ctx.createLinearGradient(this.x, this.y, tailX, tailY);
+                        gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
+                        gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+                        ctx.strokeStyle = gradient;
+                        ctx.lineWidth = this.size;
+                        ctx.beginPath();
+                        ctx.moveTo(this.x, this.y);
+                        ctx.lineTo(tailX, tailY);
+                        ctx.stroke();
+                    }
+                }
+
+                class Rocket {
+                    constructor() {
+                        this.active = true;
+                        this.reset();
+                    }
+
+                    reset() {
+                        const startSide = Math.random();
+                        if (startSide < 0.6) { // Bottom
+                            this.x = Math.random() * width;
+                            this.y = height + 50;
+                        } else if (startSide < 0.8) { // Left
+                            this.x = -50;
+                            this.y = Math.random() * height;
+                        } else { // Right
+                            this.x = width + 50;
+                            this.y = Math.random() * height;
+                        }
+
+                        const targetX = Math.random() * width;
+                        const targetY = -100;
+                        const dx = targetX - this.x;
+                        const dy = targetY - this.y;
+                        
+                        this.angle = Math.atan2(dy, dx);
+                        this.speed = 1 + Math.random() * 1.5; // ปรับความเร็วลดลง (เดิม 3 + ...)
+                        this.vx = Math.cos(this.angle) * this.speed;
+                        this.vy = Math.sin(this.angle) * this.speed;
+                        this.scale = 0.6 + Math.random() * 0.4; 
+                    }
+
+                    update() {
+                        this.x += this.vx;
+                        this.y += this.vy;
+
+                        // Create Engine Trail (Particles)
+                        if(this.active) {
+                            const backAngle = this.angle + Math.PI;
+                            const offset = 30 * this.scale;
+                            const px = this.x + Math.cos(backAngle) * offset;
+                            const py = this.y + Math.sin(backAngle) * offset;
+                            
+                            for(let i=0; i<2; i++) {
+                                const spread = (Math.random() - 0.5) * 0.5;
+                                const pSpeed = Math.random() * 2;
+                                const color = Math.random() < 0.3 ? '#3b82f6' : (Math.random() < 0.6 ? '#8b5cf6' : '#ffffff');
+                                particles.push(new Particle(px, py, backAngle + spread, pSpeed, color, 1.0));
+                            }
+                        }
+
+                        if (this.y < -100 || this.x < -100 || this.x > width + 100) {
+                            this.active = false;
+                        }
+                    }
+
+                    draw() {
+                        ctx.save();
+                        ctx.translate(this.x, this.y);
+                        ctx.rotate(this.angle + Math.PI / 2);
+                        ctx.scale(this.scale, this.scale);
+
+                        // --- DRAW COOL SPACESHIP ---
+                        
+                        // Engine Glow
+                        ctx.shadowBlur = 15;
+                        ctx.shadowColor = '#3b82f6';
+                        ctx.fillStyle = '#3b82f6';
+                        ctx.beginPath();
+                        ctx.arc(0, 25, 8, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+
+                        // Wings (Back)
+                        ctx.fillStyle = '#cbd5e1'; 
+                        ctx.beginPath();
+                        ctx.moveTo(0, 10);
+                        ctx.lineTo(-20, 35);
+                        ctx.lineTo(-5, 20);
+                        ctx.lineTo(5, 20);
+                        ctx.lineTo(20, 35);
+                        ctx.lineTo(0, 10);
+                        ctx.fill();
+
+                        // Main Fuselage
+                        ctx.fillStyle = '#f8fafc'; 
+                        ctx.beginPath();
+                        ctx.moveTo(0, -35); // Nose
+                        ctx.bezierCurveTo(15, -10, 15, 10, 10, 30); 
+                        ctx.lineTo(-10, 30); 
+                        ctx.bezierCurveTo(-15, 10, -15, -10, 0, -35); 
+                        ctx.fill();
+
+                        // Cockpit Glass
+                        ctx.fillStyle = '#06b6d4'; 
+                        ctx.shadowBlur = 5;
+                        ctx.shadowColor = 'rgba(6, 182, 212, 0.8)';
+                        ctx.beginPath();
+                        ctx.ellipse(0, -5, 4, 12, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+
+                        // Details (Red Stripes)
+                        ctx.fillStyle = '#ef4444';
+                        ctx.beginPath();
+                        ctx.moveTo(-12, 10);
+                        ctx.lineTo(-12, 25);
+                        ctx.lineTo(-8, 10);
+                        ctx.fill();
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(12, 10);
+                        ctx.lineTo(12, 25);
+                        ctx.lineTo(8, 10);
+                        ctx.fill();
+
+                        // --- CTC Text Trailing (Hologram Effect) ---
+                        ctx.save();
+                        ctx.translate(0, 65); // Move behind the engine
+                        // Pulse effect
+                        const pulse = 0.6 + Math.abs(Math.sin(Date.now() * 0.008)) * 0.4;
+                        ctx.fillStyle = `rgba(236, 72, 153, ${pulse})`; // Pink glow like Ciel brand
+                        ctx.shadowColor = '#ec4899';
+                        ctx.shadowBlur = 15;
+                        ctx.font = "800 16px 'Fredoka'"; // Bold font
+                        ctx.textAlign = "center";
+                        ctx.textBaseline = "middle";
+                        
+                        // Rotate text to align with flight path
+                        ctx.rotate(-Math.PI / 2); 
+                        ctx.fillText("CTC", 0, 0);
+                        
+                        // Add scanline effect
+                        ctx.fillStyle = `rgba(255, 255, 255, ${pulse * 0.5})`;
+                        ctx.fillRect(-15, -1, 30, 2);
+                        
+                        ctx.restore();
+                        // ------------------------------------------
+
+                        ctx.restore();
+                    }
+                }
+                
+                // --- Main Loop ---
+                resize();
+                window.addEventListener('resize', resize);
+                
+                for (let i = 0; i < STAR_COUNT; i++) {
+                    stars.push(new Star());
+                }
+                
+                const animate = () => {
+                    ctx.clearRect(0, 0, width, height);
+                    
+                    // 1. Stars (Background)
+                    stars.forEach(star => {
+                        star.update();
+                        star.draw();
+                    });
+                    
+                    // 2. Shooting Stars
+                    if (Math.random() < SHOOTING_STAR_FREQUENCY) {
+                        shootingStars.push(new ShootingStar());
+                    }
+                    shootingStars.forEach((star, index) => {
+                        if (star.active) {
+                            star.update();
+                            star.draw();
+                        } else {
+                            shootingStars.splice(index, 1);
+                        }
+                    });
+
+                    // 3. Particles (Trail) - Draw BEFORE rockets
+                    for(let i = particles.length - 1; i >= 0; i--) {
+                        particles[i].update();
+                        particles[i].draw();
+                        if(particles[i].life <= 0) {
+                            particles.splice(i, 1);
+                        }
+                    }
+
+                    // 4. Rockets
+                    if (Math.random() < ROCKET_FREQUENCY) {
+                        rockets.push(new Rocket());
+                    }
+                    rockets.forEach((rocket, index) => {
+                        if (rocket.active) {
+                            rocket.update();
+                            rocket.draw();
+                        } else {
+                            rockets.splice(index, 1);
+                        }
+                    });
+                    
+                    requestAnimationFrame(animate);
+                };
+                
+                animate();
+            };
+            
+            initStarryBackground();
+            // -------------------------------------
+
             const loader = document.getElementById('page-loader');
             if(loader) {
                 setTimeout(() => {
